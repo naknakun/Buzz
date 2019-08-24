@@ -1,65 +1,15 @@
 var express = require('express');
 var router = express.Router();
-let jwt = require('jsonwebtoken');
-let SecretObj = require('../config/jwt');
+var SignFunc = require('../utils/auth');
+var TextFunc = require('../utils/textutil');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.get('/login', function(req, res){
-  jwt.sign(
-    {
-      id : 'test',
-      pw : '1'
-    },
-    SecretObj.secret,
-    {
-      expiresIn: '5m'
-    },
-    function(err, token){
-      if(err){
-        console.log(err);
-        res.send('오류가 발생했습니다.');  
-      }                         
-      else{
-        res.cookie('user', token);
-        res.json({
-                  token: token
-        })
-      }
-    }
-  )
-});
-
-router.get('/someapi', function(req, res){
-  let token = req.cookies.user;
-  let decoded;
-  jwt.verify(token, SecretObj.secret, function(err, decoded){
-      if(err){
-          console.log(err);
-          res.send('토큰에 문제가 있어어어');
-      }
-      else{
-          if(decoded){
-              res.send('권한이 있어 실행 가능')
-          }
-          else{
-              res.send('권한이 없습니다.');
-          }
-      }
-  });  
-});
-
-router.post('/SendText', function(req, res){
-  console.log(req.body.id + ', ' + req.body.text);
-  if (req.body.id && req.body.text){
-    res.send('제대로 전송되었습니다.');
-  }
-  else{
-    res.send('받은 데이터가 읍어요');
-  }
-});
+router.get('/login', SignFunc.sign);
+router.get('/someapi', SignFunc.verify);
+router.post('/SendText', TextFunc.calltext);
 
 module.exports = router;
