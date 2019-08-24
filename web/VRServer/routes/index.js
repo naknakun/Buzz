@@ -60,6 +60,6 @@ router.post('/SendText', function(req, res){
   else{
     res.send('받은 데이터가 읍어요');
   }
- });
- 
+});
+
 module.exports = router;
