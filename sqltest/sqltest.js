@@ -1,20 +1,21 @@
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
+let DbInfo = require('./dbconfig');
 
 // Create connection to database
 var config =
 {
     authentication: {
         options: {
-            userName: 'Buzzuser', // update me
-            password: '!Abc1234' // update me
+            userName: DbInfo.userName, // update me
+            password: DbInfo.password // update me
         },
         type: 'default'
     },
-    server: 'buzzvrserver.database.windows.net', // update me
+    server: DbInfo.server, // update me
     options:
     {
-        database: 'VRDatabase', //update me
+        database: DbInfo.database, //update me
         encrypt: true
     }
 }
