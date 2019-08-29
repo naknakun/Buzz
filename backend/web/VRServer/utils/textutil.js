@@ -1,3 +1,5 @@
+var API_Call = require('./DFCall')('another');
+
 exports.calltext = function(req, res){
     console.log(req.body.id + ', ' + req.body.text);
     if (req.body.id && req.body.text){
@@ -6,4 +8,15 @@ exports.calltext = function(req, res){
     else{
       res.send('받은 데이터가 읍어요');
     }
-}
+};
+
+exports.getText = function(req, res){
+  var text = req.body.text
+  API_Call.Calldialogflow(text, function (err, result) {
+      if (!err) {
+          res.send(result);
+      } else {
+          res.send(err);
+      }
+  });
+};
