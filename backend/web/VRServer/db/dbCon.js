@@ -1,4 +1,4 @@
-let DbInfo = require('./dbconfig');
+let DbInfo = require('../config/dbconfig');
 
 exports.config =
 {

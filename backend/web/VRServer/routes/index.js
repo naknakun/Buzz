@@ -21,11 +21,16 @@ router.post('/gettext', TextFunc.getText);
 router.get('/test', function(req, res){
   request.get(
     {
-      url:'https://pokeapi.co/api/v2/pokemon/pikachu/',
-      strictSSL: false
+      url:'https://jsonplaceholder.typicode.com/users',
+       strictSSL: false
     }, 
     function(error, response, body){
-      res.json(JSON.parse(body));
+      if (error){
+        res.send(error);
+      }
+      else{
+        res.json(JSON.parse(body));
+      }        
     }
   );
 });
@@ -37,13 +42,20 @@ router.get('/test1', function(req, res){
       strictSSL: false
     }, 
     function(error, response, body){
-      res.json(JSON.parse(body));
+      if (error){
+        res.send(error);
+      }
+      else{
+        res.json(JSON.parse(body));
+      }     
     }
   );
 });
 
 router.get('/api', function(req, res){
-  test.test();
+  test.test(res);
 });
+
+router.post('/SendText1', TextFunc.calltext1);
 
 module.exports = router;

@@ -1,19 +1,15 @@
 const dialogflow = require('dialogflow');
 const uuid = require('uuid');
 
-/**
- * Send a query to the dialogflow agent, and return the query result.
- * @param {string} projectId The project to be used
- */
-exports.test = async function runSample(projectId = 'buzz-yigwxu') {
+exports.test = async function(res){
   // A unique identifier for the given session
   const sessionId = uuid.v4();
 
-// Create a new session
-const sessionClient = new dialogflow.SessionsClient({
-    keyFilename: 'C:/Users/whskrdns/Downloads/Buzz-0a0eda1755de.json'
-});
-const sessionPath = sessionClient.sessionPath(projectId, sessionId);
+  // Create a new session
+  const sessionClient = new dialogflow.SessionsClient({
+      keyFilename: '\config/Buzz-0a0eda1755de.json'
+  });
+  const sessionPath = sessionClient.sessionPath('buzz-yigwxu', sessionId);
 
   // The text query request.
   const request = {
@@ -39,4 +35,5 @@ const sessionPath = sessionClient.sessionPath(projectId, sessionId);
   } else {
     console.log(`  No intent matched.`);
   }
+  res.json(result);
 }
