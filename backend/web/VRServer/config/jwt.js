@@ -1,3 +1,3 @@
 let jwtobj = {};
-jwtobj.secret = "apple"
+jwtobj.secret = "secret"
 module.exports = jwtobj
