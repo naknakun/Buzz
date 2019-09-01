@@ -22,6 +22,7 @@ exports.calltext1 = function(req, res){
   // }
 };
 
+//rest api call 테스트
 exports.getText = function(req, res){
   var text = req.body.text
   API_Call.Calldialogflow(text, function (err, result) {

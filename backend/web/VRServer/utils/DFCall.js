@@ -74,4 +74,4 @@ module.exports = function(){
         INSTANCE = new API_Call();
     }
     return INSTANCE;
-  };
+};
