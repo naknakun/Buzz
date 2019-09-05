@@ -3,7 +3,7 @@ var router = express.Router();
 var request = require('request');
 
 var dialogtest = require('../utils/dialogtest');
-var Db = require('../db/dbExec');
+var receipt = require('../utils/receiptFunc');
 var TextFunc = require('../utils/textutil');
 
 //request.get 테스트
@@ -48,7 +48,9 @@ router.get('/dialogtest', function(req, res){
 });
 
 //db query 테스트
-router.get('/getdata', Db.query);
+router.get('/getdata', receipt.waitlist);
+router.post('/MakeReservation', receipt.Makereceipt);
+router.get('/MakeReservation1', receipt.receipt);
 
 //app에서 text 전송 테스트
 router.post('/SendText', TextFunc.calltext);
