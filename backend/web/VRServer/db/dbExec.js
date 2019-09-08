@@ -14,7 +14,38 @@ exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){
         else{
             var queryString = `
                                 SELECT
-                                    H.H_KEY, M.M_KEY, O.O_KEY
+                                    H.H_KEY, M.M_KEY, O.O_KEY, H.H_NAME, M.M_NAME
+                                FROM
+                                    [HOSPITAL] H, [MEMBER] M, [OFFICE] O
+                                WHERE
+                                    H.H_NAME = '%s'
+                                    AND M.M_ID = '%s'
+                                    AND O.O_NAME = '%s'                            
+                                `;
+            var query = util.format(queryString, InRowReceiptInfo["clinicName"], InRowReceiptInfo["patientId"], '진료실');
+            executeSELECT(connection, query, function(error, results) {
+                if(error){
+                    response(error);
+                }
+                else{
+                    var json = results;
+                    response(null, json);
+                }
+            });
+        }
+    });    
+};
+
+exports.querySELECTUnFinish = function(AMemberInfo, response){    
+    var connection = new Connection(Dbcon.config);
+    connection.on('connect', function(err){
+        if(err){
+            response(err);
+        }
+        else{
+            var queryString = `
+                                SELECT
+                                    H.H_KEY, M.M_KEY, O.O_KEY, H.H_NAME, M.M_NAME
                                 FROM
                                     [HOSPITAL] H, [MEMBER] M, [OFFICE] O
                                 WHERE
@@ -74,8 +105,13 @@ exports.queryINSERT = function(InReceiptInfo, response){
                 if(error){
                     response(error);
                 }
-                else{                    
-                    response(null);
+                else{
+                    var resTextBorn = "%s님 %s에 %s에 예약 되었습니다.";
+                    var resText = util.format(resTextBorn, 
+                                              InReceiptInfo["M_NAME"], 
+                                              InReceiptInfo["H_NAME"], 
+                                              InReceiptInfo["RECEPTION_TIME_TEXT"]);
+                    response(null, resText);
                 }
             });
         }
