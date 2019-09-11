@@ -1,4 +1,8 @@
+const uuid = require('uuid');
+
 var API_Call = require('./DFCall')('another');
+var dialog = require('../utils/dialogtest');
+var receipt = require('../utils/receiptFunc');
 
 exports.calltext = function(req, res){
     console.log(req.body.id + ', ' + req.body.text);
@@ -25,5 +29,25 @@ exports.getText = function(req, res){
       } else {
           res.send(err);
       }
+  });
+};
+
+exports.dialogFlowSetUUID = function(req, res){
+  var TextBody = JSON.parse(req.body);
+  // A unique identifier for the given session
+  var InUUID = uuid.v4();
+  dialog.flow(InUUID, TextBody["TEXT"], function(RowResult){
+    if(RowResult.intent){
+      receipt.Makereceipt(RowResult, res);      
+    }
+    else
+      res.send("매칭되는 intent가 없습니다.");
+  });
+};
+
+exports.dialogFlow = function(req, res){
+  var TextBody = JSON.parse(req.body);
+  dialog.flow(TextBody["sessionId"], TextBody["TEXT"], function(result){
+    res.send(result);
   });
 };

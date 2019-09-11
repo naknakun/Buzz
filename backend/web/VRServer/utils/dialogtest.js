@@ -1,15 +1,11 @@
 const dialogflow = require('dialogflow');
-const uuid = require('uuid');
 
-exports.test = async function(res){
-  // A unique identifier for the given session
-  const sessionId = uuid.v4();
-
+exports.flow = async function(InUUID, Intext, callback){
   // Create a new session
   const sessionClient = new dialogflow.SessionsClient({
       keyFilename: '\config/Buzz-0a0eda1755de.json'
   });
-  const sessionPath = sessionClient.sessionPath('buzz-yigwxu', sessionId);
+  const sessionPath = sessionClient.sessionPath('buzz-yigwxu', InUUID);
 
   // The text query request.
   const request = {
@@ -17,7 +13,7 @@ exports.test = async function(res){
     queryInput: {
       text: {
         // The query to send to the dialogflow agent
-        text: '두시에 병원 예약해줘',
+        text: Intext,
         // The language used by the client (en-US)
         languageCode: 'ko',
       },
@@ -35,5 +31,5 @@ exports.test = async function(res){
   } else {
     console.log(`  No intent matched.`);
   }
-  res.json(result);
+  callback(result);
 }

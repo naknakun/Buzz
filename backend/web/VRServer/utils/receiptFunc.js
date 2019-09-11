@@ -22,8 +22,8 @@ exports.receipt = function(req, res){
     });
 };
 
-exports.Makereceipt = function(req, res){
-    var ARowReceiptInfo = JSON.parse(req.body);
+exports.Makereceipt = function(ARowReceiptInfo, res){
+    // var ARowReceiptInfo = JSON.parse(req.body);
     Db.querySELECTReceiptInfo(ARowReceiptInfo, function(err, result){
         if(err){
             res.send(err);
