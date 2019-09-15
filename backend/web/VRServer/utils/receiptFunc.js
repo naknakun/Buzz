@@ -1,5 +1,5 @@
 var Db = require('../db/dbExec');
-var response = require('./response');
+var responseFunc = require('./response');
 
 exports.waitlist = function(req, res){
     Db.querySELECT('OFFICE', function(err, result){
@@ -37,7 +37,7 @@ exports.Makereceipt = function(ARowReceiptInfo, res){
                     return;
                 }
                 else{
-                    ResResult = response.GetdialogRes(response.resType.DialogFinish, resText);
+                    ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
                     res.send(ResResult);
                     return;
                 }
@@ -52,18 +52,25 @@ exports.Cancelreceipt = function(InMemberid, res){
             res.send(err);
             return;
         }
-        else{     
-            Db.queryINSERT(SetReceiptInfo(result, null, 2), function(err, resText){
-                if(err){
-                    res.send(err);
-                    return;
-                }
-                else{
-                    ResResult = response.GetdialogRes(response.resType.DialogFinish, resText);
-                    res.send(ResResult);
-                    return;
-                }
-            });
+        else{
+            if(result.length == 0){                
+                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, "예약 내역이 존재하지 않습니다.");
+                res.send(ResResult);
+                return;
+            }
+            else{
+                Db.queryINSERT(SetReceiptInfo(result, null, 2), function(err, resText){
+                    if(err){
+                        res.send(err);
+                        return;
+                    }
+                    else{
+                        ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
+                        res.send(ResResult);
+                        return;
+                    }
+                });
+            }
         }
     });
 };
@@ -89,14 +96,24 @@ function SetReceiptInfo(result, ARowReceiptInfo, State){
     return AReceiptInfo;
 }
 
-exports.UnFinishReceipt = function(req, res){
-    var AMemberInfo = JSON.parse(req.body);
-    Db.querySELECTUnFinish(AMemberInfo, function(err, result){
+exports.Checkreceipt = function(InMemberid, res){
+    Db.querySELECTReceiptUnFinish(InMemberid, function(err, result){
         if(err){
             res.send(err);
+            return;
         }
         else{
-            res.send(result);
+            if(result.length == 0){                
+                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, "예약 내역이 존재하지 않습니다.");
+                res.send(ResResult);
+                return;
+            }
+            else{                
+                resText = responseFunc.GetReceiptResText(SetReceiptInfo(result, null, 1));  
+                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
+                res.send(ResResult);
+                return;
+            }
         }
     });
 }

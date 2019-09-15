@@ -50,8 +50,6 @@ router.get('/getdata', receipt.waitlist);
 //접수 등록
 // router.post('/MakeReservation', receipt.Makereceipt);
 router.get('/MakeReservation1', receipt.receipt);
-//완료되지 않은 접수 리스트
-router.post('/UnFinishReceipt', receipt.UnFinishReceipt);
 
 //app에서 text 전송 테스트
 router.post('/SendText', TextFunc.calltext);

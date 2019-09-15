@@ -3,40 +3,10 @@ var Request = require('tedious').Request;
 var TYPES = require('tedious').TYPES; 
 var util = require("util");
 
+var responseFunc = require('../utils/response');
 var Dbcon = require('./dbCon');
 
 exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){    
-    var connection = new Connection(Dbcon.config);
-    connection.on('connect', function(err){
-        if(err){
-            response(err);
-        }
-        else{
-            var queryString = `
-                                SELECT
-                                    H.H_KEY, M.M_KEY, O.O_KEY, H.H_NAME, M.M_NAME
-                                FROM
-                                    [HOSPITAL] H, [MEMBER] M, [OFFICE] O
-                                WHERE
-                                    H.H_NAME = '%s'
-                                    AND M.M_ID = '%s'
-                                    AND O.O_NAME = '%s'                            
-                                `;
-            var query = util.format(queryString, InRowReceiptInfo["clinicName"], InRowReceiptInfo["patientId"], '진료실');
-            executeSELECT(connection, query, function(error, results) {
-                if(error){
-                    response(error);
-                }
-                else{
-                    var json = results;
-                    response(null, json);
-                }
-            });
-        }
-    });    
-};
-
-exports.querySELECTUnFinish = function(AMemberInfo, response){    
     var connection = new Connection(Dbcon.config);
     connection.on('connect', function(err){
         if(err){
@@ -76,7 +46,7 @@ exports.querySELECTReceiptUnFinish = function(InMemberid, response){
         else{
             var queryString = `
                                 SELECT
-                                    H_KEY, M_KEY, O_KEY, RECEPTION_TIME,
+                                    TOP 1 H_KEY, M_KEY, O_KEY, RECEPTION_TIME,
                                     (SELECT H_NAME FROM HOSPITAL WHERE H_KEY = R.H_KEY) AS H_NAME,
                                     (SELECT M_NAME FROM MEMBER WHERE M_ID = '%s') AS M_NAME
                                 FROM
@@ -141,15 +111,7 @@ exports.queryINSERT = function(InReceiptInfo, response){
                     response(error);
                 }
                 else{
-                    if(InReceiptInfo["S_KEY"] == 1)
-                        var resTextBorn = "%s님 %s에 %s에 예약 되었습니다.";
-                    else if(InReceiptInfo["S_KEY"] == 2)
-                        var resTextBorn = "%s님 %s에 %s에 예약취소 되었습니다.";
-
-                    var resText = util.format(resTextBorn, 
-                                              InReceiptInfo["M_NAME"], 
-                                              InReceiptInfo["H_NAME"], 
-                                              InReceiptInfo["RECEPTION_TIME_TEXT"]);
+                    resText = responseFunc.GetReceiptResText(InReceiptInfo);                    
                     response(null, resText);
                 }
             });
