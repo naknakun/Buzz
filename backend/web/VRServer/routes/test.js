@@ -42,7 +42,7 @@ router.get('/test1', function(req, res){
 });
 
 //dialog flow call 테스트
-router.post('/dialogFlowSetUUID', TextFunc.dialogFlowSetUUID);
+router.post('/dialogFlowStart', TextFunc.dialogFlowStart);
 router.post('/dialogFlow', TextFunc.dialogFlow);
 
 //db query 테스트
