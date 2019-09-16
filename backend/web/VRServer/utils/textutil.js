@@ -55,6 +55,7 @@ exports.dialogFlow = function(req, res){
           }
           //대기열확인
           case 'CheckNumOfWaitingPatients':{
+            receipt.CheckNumOfWaitingPatients(result.parameters.fields["ClinicName"].stringValue, res);
             return;
           }
           default:{

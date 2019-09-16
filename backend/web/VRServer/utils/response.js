@@ -9,14 +9,14 @@ exports.GetdialogRes = function(resType, TEXT){
 
 exports.GetCNOPResText = function(InOfficeInfoArray){
     var resTextBorn = "%s의 %s에 %s명 있습니다.";
-    var resText;
-    InOfficeInfoArray.array.forEach(element => {
-        resText = resText + ' ' + util.format(resTextBorn,
-                                              element.H_NAME,
-                                              element.O_NAME,
-                                              element.PATIENT_COUNT);
+    var resText = "";
+    InOfficeInfoArray.forEach(element => {
+        resText = resText + util.format(resTextBorn,
+                                        element.H_NAME,
+                                        element.O_NAME,
+                                        element.PATIENT_COUNT) + " ";
     });
-    return resText;
+    return resText.trim();
 }
 
 exports.GetReceiptResText = function(ReceiptInfo){

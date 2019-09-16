@@ -118,8 +118,8 @@ exports.Checkreceipt = function(InMemberid, res){
     });
 }
 
-exports.CheckNumOfWaitingPatients = function(InHospitalKey, res){
-    Db.querySELECTOFFICE(InHospitalKey, function(err, result){
+exports.CheckNumOfWaitingPatients = function(InHospitalName, res){
+    Db.querySELECTOFFICE(InHospitalName, function(err, result){
         if(err){
             res.send(err);
             return;
@@ -144,7 +144,7 @@ function SetOfficeInfoArray(result){
     var AOfficeInfoArray = new Array();             
     var AOfficeInfo;
 
-    result.array.forEach(element => {
+    result.forEach(element => {
         AOfficeInfo = new Object();
         AOfficeInfo.O_KEY = element["O_KEY"];
         AOfficeInfo.O_NAME = element["O_NAME"];
