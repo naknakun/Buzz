@@ -1,0 +1,7 @@
+{
+    "appService.zipIgnorePattern": [
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/83304ad0-2f82-4dcf-9f14-ddff1d4ee896/resourceGroups/cloud-shell-storage-southeastasia/providers/Microsoft.Web/sites/codecaffeine",
+    "appService.deploySubpath": ""
+}

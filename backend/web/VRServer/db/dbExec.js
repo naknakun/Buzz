@@ -3,6 +3,7 @@ var Request = require('tedious').Request;
 var TYPES = require('tedious').TYPES; 
 var util = require("util");
 
+var responseFunc = require('../utils/response');
 var Dbcon = require('./dbCon');
 
 exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){    
@@ -14,7 +15,7 @@ exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){
         else{
             var queryString = `
                                 SELECT
-                                    H.H_KEY, M.M_KEY, O.O_KEY
+                                    H.H_KEY, M.M_KEY, O.O_KEY, H.H_NAME, M.M_NAME
                                 FROM
                                     [HOSPITAL] H, [MEMBER] M, [OFFICE] O
                                 WHERE
@@ -23,6 +24,41 @@ exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){
                                     AND O.O_NAME = '%s'                            
                                 `;
             var query = util.format(queryString, InRowReceiptInfo["clinicName"], InRowReceiptInfo["patientId"], '진료실');
+            executeSELECT(connection, query, function(error, results) {
+                if(error){
+                    response(error);
+                }
+                else{
+                    var json = results;
+                    response(null, json);
+                }
+            });
+        }
+    });    
+};
+
+exports.querySELECTReceiptUnFinish = function(InMemberid, response){    
+    var connection = new Connection(Dbcon.config);
+    connection.on('connect', function(err){
+        if(err){
+            response(err);
+        }
+        else{
+            var queryString = `
+                                SELECT
+                                    TOP 1 H_KEY, M_KEY, O_KEY, RECEPTION_TIME,
+                                    (SELECT H_NAME FROM HOSPITAL WHERE H_KEY = R.H_KEY) AS H_NAME,
+                                    (SELECT M_NAME FROM MEMBER WHERE M_ID = '%s') AS M_NAME
+                                FROM
+                                    [RECEPTION] R
+                                WHERE
+                                    (M_KEY = (SELECT M_KEY FROM MEMBER WHERE M_ID = '%s'))
+                                    AND (RECEPTION_FINISH = 0)
+                                    AND (S_KEY = 1)
+                                ORDER BY
+                                    RECEPTION_TIME DESC;                       
+                                `;
+            var query = util.format(queryString, InMemberid, InMemberid);
             executeSELECT(connection, query, function(error, results) {
                 if(error){
                     response(error);
@@ -74,8 +110,9 @@ exports.queryINSERT = function(InReceiptInfo, response){
                 if(error){
                     response(error);
                 }
-                else{                    
-                    response(null);
+                else{
+                    resText = responseFunc.GetReceiptResText(InReceiptInfo);                    
+                    response(null, resText);
                 }
             });
         }

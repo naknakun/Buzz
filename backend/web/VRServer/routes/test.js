@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var request = require('request');
 
-var dialogtest = require('../utils/dialogtest');
 var receipt = require('../utils/receiptFunc');
 var TextFunc = require('../utils/textutil');
 
@@ -43,13 +42,13 @@ router.get('/test1', function(req, res){
 });
 
 //dialog flow call 테스트
-router.get('/dialogtest', function(req, res){
-    dialogtest.test(res);
-});
+router.post('/dialogFlowStart', TextFunc.dialogFlowStart);
+router.post('/dialogFlow', TextFunc.dialogFlow);
 
 //db query 테스트
 router.get('/getdata', receipt.waitlist);
-router.post('/MakeReservation', receipt.Makereceipt);
+//접수 등록
+// router.post('/MakeReservation', receipt.Makereceipt);
 router.get('/MakeReservation1', receipt.receipt);
 
 //app에서 text 전송 테스트
