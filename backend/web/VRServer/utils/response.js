@@ -7,6 +7,18 @@ exports.GetdialogRes = function(resType, TEXT){
     return response;
 }
 
+exports.GetCNOPResText = function(InOfficeInfoArray){
+    var resTextBorn = "%s의 %s에 %s명 있습니다.";
+    var resText;
+    InOfficeInfoArray.array.forEach(element => {
+        resText = resText + ' ' + util.format(resTextBorn,
+                                              element.H_NAME,
+                                              element.O_NAME,
+                                              element.PATIENT_COUNT);
+    });
+    return resText;
+}
+
 exports.GetReceiptResText = function(ReceiptInfo){
     if(ReceiptInfo["S_KEY"] == 1)
         var resTextBorn = "%s님 %s에 %s에 예약 되었습니다.";

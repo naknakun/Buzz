@@ -117,3 +117,42 @@ exports.Checkreceipt = function(InMemberid, res){
         }
     });
 }
+
+exports.CheckNumOfWaitingPatients = function(InHospitalKey, res){
+    Db.querySELECTOFFICE(InHospitalKey, function(err, result){
+        if(err){
+            res.send(err);
+            return;
+        }
+        else{
+            if(result.length == 0){                
+                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, "해당 요양기관에 대한 진료실이 존재하지 않습니다.");
+                res.send(ResResult);
+                return;
+            }
+            else{                
+                resText = responseFunc.GetCNOPResText(SetOfficeInfoArray(result));  
+                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
+                res.send(ResResult);
+                return;
+            }
+        }
+    });
+};
+
+function SetOfficeInfoArray(result){
+    var AOfficeInfoArray = new Array();             
+    var AOfficeInfo;
+
+    result.array.forEach(element => {
+        AOfficeInfo = new Object();
+        AOfficeInfo.O_KEY = element["O_KEY"];
+        AOfficeInfo.O_NAME = element["O_NAME"];
+        AOfficeInfo.H_KEY = element["H_KEY"];
+        AOfficeInfo.PATIENT_COUNT = element["PATIENT_COUNT"];
+        AOfficeInfo.H_NAME = element["H_NAME"];
+        AOfficeInfoArray.push(AOfficeInfo);
+    });
+    
+    return AOfficeInfoArray;
+}

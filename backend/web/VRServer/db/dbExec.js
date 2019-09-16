@@ -72,6 +72,45 @@ exports.querySELECTReceiptUnFinish = function(InMemberid, response){
     });    
 };
 
+exports.querySELECTOFFICE = function(InHospitalKey, response){    
+    var connection = new Connection(Dbcon.config);
+    connection.on('connect', function(err){
+        if(err){
+            response(err);
+        }
+        else{
+            var queryString = `
+                                SELECT
+                                    O_KEY,
+                                    O_NAME,
+                                    H_KEY,
+                                    PATIENT_COUNT,
+                                    H_NAME
+                                FROM
+                                    [OFFICE] O
+                                INNER JOIN
+                                    [HOSPITAL] H
+                                WHERE
+                                    (H.H_NAME = '%s')
+                                    AND (CONVERT(char(10), LAST_UPDATE_DATE, 126) =
+                                        CONVERT(char(10), [DBO].[dReturnDate](getdate()),126))
+                                ORDER BY
+                                    O_KEY;                      
+                                `;
+            var query = util.format(queryString, InHospitalKey);
+            executeSELECT(connection, query, function(error, results) {
+                if(error){
+                    response(error);
+                }
+                else{
+                    var json = results;
+                    response(null, json);
+                }
+            });
+        }
+    });    
+};
+
 exports.querySELECT = function(tname, response){    
     var connection = new Connection(Dbcon.config);
     connection.on('connect', function(err){
