@@ -20,9 +20,9 @@ exports.GetCNOPResText = function(InOfficeInfoArray){
 }
 
 exports.GetReceiptResText = function(ReceiptInfo){
-    if(ReceiptInfo["S_KEY"] == 1)
+    if(ReceiptInfo["S_KEY"] == 0)
         var resTextBorn = "%s님 %s에 %s에 예약 되었습니다.";
-    else if(ReceiptInfo["S_KEY"] == 2)
+    else if(ReceiptInfo["S_KEY"] == 1)
         var resTextBorn = "%s님 %s에 %s에 예약취소 되었습니다."; 
 
     var resText = util.format(resTextBorn, 

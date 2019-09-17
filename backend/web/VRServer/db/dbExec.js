@@ -46,15 +46,15 @@ exports.querySELECTReceiptUnFinish = function(InMemberid, response){
         else{
             var queryString = `
                                 SELECT
-                                    TOP 1 H_KEY, M_KEY, O_KEY, RECEPTION_TIME,
+                                    TOP 1 R_KEY,H_KEY, M_KEY, O_KEY, RECEPTION_TIME,
                                     (SELECT H_NAME FROM HOSPITAL WHERE H_KEY = R.H_KEY) AS H_NAME,
-                                    (SELECT M_NAME FROM MEMBER WHERE M_ID = '%s') AS M_NAME
+                                    (SELECT M_NAME FROM MEMBER WHERE M_ID = '%s') AS M_NAME,
+                                    (SELECT S_KEY FROM RECEPTION_RESULT WHERE R_KEY = R.R_KEY) AS S_KEY
                                 FROM
                                     [RECEPTION] R
                                 WHERE
                                     (M_KEY = (SELECT M_KEY FROM MEMBER WHERE M_ID = '%s'))
-                                    AND (RECEPTION_FINISH = 0)
-                                    AND (S_KEY = 1)
+                                    AND (S_KEY NOT NULL)
                                 ORDER BY
                                     RECEPTION_TIME DESC;                       
                                 `;
@@ -147,15 +147,12 @@ exports.queryINSERT = function(InReceiptInfo, response){
             response(err);
         }
         else{
-            executeINSERT(connection, InReceiptInfo, function(error) {
-                if(error){
-                    response(error);
-                }
-                else{
-                    resText = responseFunc.GetReceiptResText(InReceiptInfo);                    
-                    response(null, resText);
-                }
-            });
+            if(InReceiptInfo.S_KEY = 0){
+                executeINSERT(connection, InReceiptInfo, response);
+            }
+            else if(InReceiptInfo.S_KEY = 1){
+                executeINSERTReception_Result(connection, InReceiptInfo, response);
+            }            
         }
     });    
 };
@@ -191,7 +188,6 @@ function executeINSERT(connection, InReceiptInfo, callback) {
         M_KEY, 
         H_KEY, 
         O_KEY, 
-        S_KEY, 
         RECEPTION_TIME
     ) 
     VALUES 
@@ -199,7 +195,6 @@ function executeINSERT(connection, InReceiptInfo, callback) {
         @M_KEY, 
         @H_KEY, 
         @O_KEY, 
-        @S_KEY, 
         @RECEPTION_TIME
     );`
     var request = new Request(
@@ -208,13 +203,40 @@ function executeINSERT(connection, InReceiptInfo, callback) {
             if (error) {
                 return callback(error);
             }
-            callback(null);
+            resText = responseFunc.GetReceiptResText(InReceiptInfo);
+            callback(null, resText);
         }
     );
     request.addParameter('M_KEY', TYPES.Int, InReceiptInfo["M_KEY"]);  
     request.addParameter('H_KEY', TYPES.NVarChar, InReceiptInfo["H_KEY"]);  
     request.addParameter('O_KEY', TYPES.Int, InReceiptInfo["O_KEY"]);  
-    request.addParameter('S_KEY', TYPES.Int, InReceiptInfo["S_KEY"]);  
     request.addParameter('RECEPTION_TIME', TYPES.DateTime, new Date(InReceiptInfo["RECEPTION_TIME"]));
+    connection.execSql(request);
+}
+
+function executeINSERTReception_Result(connection, InReceiptInfo, callback) {
+    var query = `
+    INSERT INTO [DBO].[RECEPTION]
+    (
+        R_KEY,
+        S_KEY
+    ) 
+    VALUES 
+    (
+        @R_KEY, 
+        @S_KEY
+    );`
+    var request = new Request(
+        query, 
+        function(error) {
+            if (error) {
+                return callback(error);
+            }
+            resText = responseFunc.GetReceiptResText(InReceiptInfo);
+            callback(null, resText);
+        }
+    );
+    request.addParameter('R_KEY', TYPES.Int, InReceiptInfo["R_KEY"]);  
+    request.addParameter('S_KEY', TYPES.Int, InReceiptInfo["S_KEY"]);  
     connection.execSql(request);
 }

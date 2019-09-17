@@ -31,7 +31,7 @@ exports.Makereceipt = function(ARowReceiptInfo, res){
             return;
         }
         else{     
-            Db.queryINSERT(SetReceiptInfo(result, ARowReceiptInfo, 1), function(err, resText){
+            Db.queryINSERT(SetReceiptInfo(result, ARowReceiptInfo, 0), function(err, resText){
                 if(err){
                     res.send(err);
                     return;
@@ -59,7 +59,7 @@ exports.Cancelreceipt = function(InMemberid, res){
                 return;
             }
             else{
-                Db.queryINSERT(SetReceiptInfo(result, null, 2), function(err, resText){
+                Db.queryINSERT(SetReceiptInfo(result, null, 1), function(err, resText){
                     if(err){
                         res.send(err);
                         return;
@@ -87,7 +87,8 @@ function SetReceiptInfo(result, ARowReceiptInfo, State){
     if(ARowReceiptInfo == null){
         var Reception_time = result[0]["RECEPTION_TIME"].toISOString();
         AReceiptInfo["RECEPTION_TIME"] = Reception_time.substr(0, 10) + 'T' + Reception_time.substr(11, 8) + 'Z';
-        AReceiptInfo["RECEPTION_TIME_TEXT"] = Reception_time.substr(0, 10) + ' ' + Reception_time.substr(11, 8); 
+        AReceiptInfo["RECEPTION_TIME_TEXT"] = Reception_time.substr(0, 10) + ' ' + Reception_time.substr(11, 8);
+        AReceiptInfo["R_KEY"] = result[0]["R_KEY"]; 
     }
     else{
         AReceiptInfo["RECEPTION_TIME"] = ARowReceiptInfo["date"] + 'T' + ARowReceiptInfo["time"] + 'Z';
@@ -109,7 +110,7 @@ exports.Checkreceipt = function(InMemberid, res){
                 return;
             }
             else{                
-                resText = responseFunc.GetReceiptResText(SetReceiptInfo(result, null, 1));  
+                resText = responseFunc.GetReceiptResText(SetReceiptInfo(result, null, 0));  
                 ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
                 res.send(ResResult);
                 return;
