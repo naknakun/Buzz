@@ -24,7 +24,6 @@ exports.receipt = function(req, res){
 };
 
 exports.Makereceipt = function(ARowReceiptInfo, res){
-    // var ARowReceiptInfo = JSON.parse(req.body);
     Db.querySELECTReceiptInfo(ARowReceiptInfo, function(err, result){
         if(err){
             res.send(err);
@@ -78,21 +77,21 @@ exports.Cancelreceipt = function(InMemberid, res){
 function SetReceiptInfo(result, ARowReceiptInfo, State){
     var AReceiptInfo = {M_KEY:'', H_KEY:'', O_KEY:'', S_KEY:'', RECEPTION_TIME:'', RECEPTION_TIME_TEXT:'',
                          H_NAME:'', M_NAME:''};
-    AReceiptInfo["M_KEY"] = result[0]["M_KEY"]; 
-    AReceiptInfo["H_KEY"] = result[0]["H_KEY"]; 
-    AReceiptInfo["O_KEY"] = result[0]["O_KEY"]; 
-    AReceiptInfo["H_NAME"] = result[0]["H_NAME"];
-    AReceiptInfo["M_NAME"] = result[0]["M_NAME"];
-    AReceiptInfo["S_KEY"] = State; 
+    AReceiptInfo.M_KEY = result[0].M_KEY; 
+    AReceiptInfo.H_KEY = result[0].H_KEY; 
+    AReceiptInfo.O_KEY = result[0].O_KEY; 
+    AReceiptInfo.H_NAME = result[0].H_NAME;
+    AReceiptInfo.M_NAME = result[0].M_NAME;
+    AReceiptInfo.S_KEY = State; 
     if(ARowReceiptInfo == null){
-        var Reception_time = result[0]["RECEPTION_TIME"].toISOString();
-        AReceiptInfo["RECEPTION_TIME"] = Reception_time.substr(0, 10) + 'T' + Reception_time.substr(11, 8) + 'Z';
-        AReceiptInfo["RECEPTION_TIME_TEXT"] = Reception_time.substr(0, 10) + ' ' + Reception_time.substr(11, 8);
-        AReceiptInfo["R_KEY"] = result[0]["R_KEY"]; 
+        var Reception_time = result[0].RECEPTION_TIME.toISOString();
+        AReceiptInfo.RECEPTION_TIME = Reception_time.substr(0, 10) + 'T' + Reception_time.substr(11, 8) + 'Z';
+        AReceiptInfo.RECEPTION_TIME_TEXT = Reception_time.substr(0, 10) + ' ' + Reception_time.substr(11, 8);
+        AReceiptInfo.R_KEY = result[0].R_KEY; 
     }
     else{
-        AReceiptInfo["RECEPTION_TIME"] = ARowReceiptInfo["date"] + 'T' + ARowReceiptInfo["time"] + 'Z';
-        AReceiptInfo["RECEPTION_TIME_TEXT"] = ARowReceiptInfo["date"] + ' ' + ARowReceiptInfo["time"]; 
+        AReceiptInfo.RECEPTION_TIME = ARowReceiptInfo.date + 'T' + ARowReceiptInfo.time + 'Z';
+        AReceiptInfo.RECEPTION_TIME_TEXT = ARowReceiptInfo.date + ' ' + ARowReceiptInfo.time; 
     }
     return AReceiptInfo;
 }
@@ -127,7 +126,7 @@ exports.CheckNumOfWaitingPatients = function(InHospitalName, res){
         }
         else{
             if(result.length == 0){                
-                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, "해당 요양기관에 대한 진료실이 존재하지 않습니다.");
+                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, "해당 요양기관에 대한 대기열정보가 존재하지 않습니다.");
                 res.send(ResResult);
                 return;
             }
@@ -147,11 +146,11 @@ function SetOfficeInfoArray(result){
 
     result.forEach(element => {
         AOfficeInfo = new Object();
-        AOfficeInfo.O_KEY = element["O_KEY"];
-        AOfficeInfo.O_NAME = element["O_NAME"];
-        AOfficeInfo.H_KEY = element["H_KEY"];
-        AOfficeInfo.PATIENT_COUNT = element["PATIENT_COUNT"];
-        AOfficeInfo.H_NAME = element["H_NAME"];
+        AOfficeInfo.O_KEY = element.O_KEY;
+        AOfficeInfo.O_NAME = element.O_NAME;
+        AOfficeInfo.H_KEY = element.H_KEY;
+        AOfficeInfo.PATIENT_COUNT = element.PATIENT_COUNT;
+        AOfficeInfo.H_NAME = element.H_NAME;
         AOfficeInfoArray.push(AOfficeInfo);
     });
     

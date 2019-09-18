@@ -51,6 +51,25 @@ router.get('/getdata', receipt.waitlist);
 // router.post('/MakeReservation', receipt.Makereceipt);
 router.get('/MakeReservation1', receipt.receipt);
 
+
+// 각 기능 테스트
+router.post('/Makereceipt', function(req, res){
+  var info = JSON.parse(req.body);
+  receipt.Makereceipt(info, res);
+});
+router.post('/Cancelreceipt', function(req, res){
+  var info = JSON.parse(req.body);
+  receipt.Cancelreceipt(info.MEMBERID, res);
+});
+router.post('/Checkreceipt', function(req, res){
+  var info = JSON.parse(req.body);
+  receipt.Checkreceipt(info.MEMBERID, res);
+});
+router.post('/CheckNumOfWaitingPatients', function(req, res){
+  var info = JSON.parse(req.body);
+  receipt.CheckNumOfWaitingPatients(info["ClinicName"], res);
+});
+
 //app에서 text 전송 테스트
 router.post('/SendText', TextFunc.calltext);
 router.post('/SendText1', TextFunc.calltext1);

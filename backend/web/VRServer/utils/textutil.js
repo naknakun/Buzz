@@ -82,7 +82,7 @@ exports.dialogFlow = function(req, res){
 
 exports.dialogFlowStart = function(req, res){
   var TextBody = JSON.parse(req.body);
-  dialog.ContextDelete(TextBody["MEMBERID"], function(dialogResult){
+  dialog.ContextDelete(TextBody.MEMBERID, function(dialogResult){
     var result = {dialogStart:dialogResult};
     res.send(result);
   });
@@ -90,10 +90,10 @@ exports.dialogFlowStart = function(req, res){
 
 function SetReciptInfo(RowParameters, memberId){
   var Parameters = {clinicName:'', date:'', time:'', patientId:''};
-  Parameters["clinicName"] = RowParameters["ClinicName"].stringValue; 
-  var datestr = RowParameters["time"].stringValue;
-  Parameters["date"] = datestr.substr(0, 10); 
-  Parameters["time"] = datestr.substr(11, 8); 
-  Parameters["patientId"] = memberId;
+  Parameters.clinicName = RowParameters.ClinicName.stringValue; 
+  var datestr = RowParameters.time.stringValue;
+  Parameters.date = datestr.substr(0, 10); 
+  Parameters.time = datestr.substr(11, 8); 
+  Parameters.memberId = memberId;
   return Parameters;
 }

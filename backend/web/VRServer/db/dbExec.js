@@ -23,7 +23,7 @@ exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){
                                     AND M.M_ID = '%s'
                                     AND O.O_NAME = '%s'                            
                                 `;
-            var query = util.format(queryString, InRowReceiptInfo["clinicName"], InRowReceiptInfo["patientId"], '진료실');
+            var query = util.format(queryString, InRowReceiptInfo.clinicName, InRowReceiptInfo.MEMBERID, '진료실');
             executeSELECT(connection, query, function(error, results) {
                 if(error){
                     response(error);
@@ -45,20 +45,30 @@ exports.querySELECTReceiptUnFinish = function(InMemberid, response){
         }
         else{
             var queryString = `
-                                SELECT
-                                    TOP 1 R_KEY,H_KEY, M_KEY, O_KEY, RECEPTION_TIME,
-                                    (SELECT H_NAME FROM HOSPITAL WHERE H_KEY = R.H_KEY) AS H_NAME,
-                                    (SELECT M_NAME FROM MEMBER WHERE M_ID = '%s') AS M_NAME,
-                                    (SELECT S_KEY FROM RECEPTION_RESULT WHERE R_KEY = R.R_KEY) AS S_KEY
+                                SELECT 
+                                    TOP 1 R.R_KEY, R.H_KEY, R.M_KEY, O_KEY, RECEPTION_TIME,
+                                    H_NAME, M_NAME, S_KEY
                                 FROM
-                                    [RECEPTION] R
+                                    RECEPTION R
+                                 INNER JOIN
+                                    HOSPITAL H
+                                ON 
+                                    R.H_KEY = H.H_KEY
+                                INNER JOIN 
+                                    MEMBER M
+                                ON
+                                    R.M_KEY = M.M_KEY
+                                LEFT OUTER JOIN
+                                    RECEPTION_RESULT RR
+                                ON
+                                    R.R_KEY = RR.R_KEY
                                 WHERE
-                                    (M_KEY = (SELECT M_KEY FROM MEMBER WHERE M_ID = '%s'))
-                                    AND (S_KEY NOT NULL)
+                                    (M.M_ID = '%s')
+                                    AND (S_KEY IS NULL)
                                 ORDER BY
-                                    RECEPTION_TIME DESC;                       
+                                    RECEPTION_TIME DESC;                     
                                 `;
-            var query = util.format(queryString, InMemberid, InMemberid);
+            var query = util.format(queryString, InMemberid);
             executeSELECT(connection, query, function(error, results) {
                 if(error){
                     response(error);
@@ -147,10 +157,10 @@ exports.queryINSERT = function(InReceiptInfo, response){
             response(err);
         }
         else{
-            if(InReceiptInfo.S_KEY = 0){
+            if(InReceiptInfo.S_KEY == 0){
                 executeINSERT(connection, InReceiptInfo, response);
             }
-            else if(InReceiptInfo.S_KEY = 1){
+            else if(InReceiptInfo.S_KEY == 1){
                 executeINSERTReception_Result(connection, InReceiptInfo, response);
             }            
         }
@@ -207,16 +217,16 @@ function executeINSERT(connection, InReceiptInfo, callback) {
             callback(null, resText);
         }
     );
-    request.addParameter('M_KEY', TYPES.Int, InReceiptInfo["M_KEY"]);  
-    request.addParameter('H_KEY', TYPES.NVarChar, InReceiptInfo["H_KEY"]);  
-    request.addParameter('O_KEY', TYPES.Int, InReceiptInfo["O_KEY"]);  
-    request.addParameter('RECEPTION_TIME', TYPES.DateTime, new Date(InReceiptInfo["RECEPTION_TIME"]));
+    request.addParameter('M_KEY', TYPES.Int, InReceiptInfo.M_KEY);  
+    request.addParameter('H_KEY', TYPES.NVarChar, InReceiptInfo.H_KEY);  
+    request.addParameter('O_KEY', TYPES.Int, InReceiptInfo.O_KEY);  
+    request.addParameter('RECEPTION_TIME', TYPES.DateTime, new Date(InReceiptInfo.RECEPTION_TIME));
     connection.execSql(request);
 }
 
 function executeINSERTReception_Result(connection, InReceiptInfo, callback) {
     var query = `
-    INSERT INTO [DBO].[RECEPTION]
+    INSERT INTO [DBO].[RECEPTION_RESULT]
     (
         R_KEY,
         S_KEY
@@ -236,7 +246,7 @@ function executeINSERTReception_Result(connection, InReceiptInfo, callback) {
             callback(null, resText);
         }
     );
-    request.addParameter('R_KEY', TYPES.Int, InReceiptInfo["R_KEY"]);  
-    request.addParameter('S_KEY', TYPES.Int, InReceiptInfo["S_KEY"]);  
+    request.addParameter('R_KEY', TYPES.Int, InReceiptInfo.R_KEY);  
+    request.addParameter('S_KEY', TYPES.Int, InReceiptInfo.S_KEY);  
     connection.execSql(request);
 }
