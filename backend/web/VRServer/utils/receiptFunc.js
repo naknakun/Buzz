@@ -30,17 +30,24 @@ exports.Makereceipt = function(ARowReceiptInfo, res){
             return;
         }
         else{     
-            Db.queryINSERT(SetReceiptInfo(result, ARowReceiptInfo, 0), function(err, resText){
-                if(err){
-                    res.send(err);
-                    return;
-                }
-                else{
-                    ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
-                    res.send(ResResult);
-                    return;
-                }
-            });
+            if(result.length == 0){                
+                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, "병원정보와 MEMBERID에 매칭되는 정보가 없습니다.");
+                res.send(ResResult);
+                return;
+            }
+            else{
+                Db.queryINSERT(SetReceiptInfo(result, ARowReceiptInfo, 0), function(err, resText){
+                    if(err){
+                        res.send(err);
+                        return;
+                    }
+                    else{
+                        ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
+                        res.send(ResResult);
+                        return;
+                    }
+                });
+            }
         }
     });
 };
