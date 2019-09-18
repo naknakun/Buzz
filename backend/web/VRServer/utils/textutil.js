@@ -94,6 +94,6 @@ function SetReciptInfo(RowParameters, memberId){
   var datestr = RowParameters.time.stringValue;
   Parameters.date = datestr.substr(0, 10); 
   Parameters.time = datestr.substr(11, 8); 
-  Parameters.memberId = memberId;
+  Parameters.MEMBERID = memberId;
   return Parameters;
 }
