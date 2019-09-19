@@ -160,7 +160,7 @@ exports.queryINSERT = function(InReceiptInfo, response){
             if(InReceiptInfo.S_KEY == 0){
                 executeINSERT(connection, InReceiptInfo, response);
             }
-            else if(InReceiptInfo.S_KEY == 1){
+            else if(InReceiptInfo.S_KEY == 1 || InReceiptInfo.S_KEY == 2){
                 executeINSERTReception_Result(connection, InReceiptInfo, response);
             }            
         }
@@ -242,8 +242,13 @@ function executeINSERTReception_Result(connection, InReceiptInfo, callback) {
             if (error) {
                 return callback(error);
             }
-            resText = responseFunc.GetReceiptResText(InReceiptInfo);
-            callback(null, resText);
+            if(InReceiptInfo.S_KEY == 1){
+                resText = responseFunc.GetReceiptResText(InReceiptInfo);
+                callback(null, resText);
+            }
+            else if(InReceiptInfo.S_KEY == 2){
+                callback(null);
+            }         
         }
     );
     request.addParameter('R_KEY', TYPES.Int, InReceiptInfo.R_KEY);  

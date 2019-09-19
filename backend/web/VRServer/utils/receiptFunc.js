@@ -245,8 +245,9 @@ exports.FinishReceip = function(req, res){
     var ReceiptInfo = new Object();
     ReceiptInfo.R_KEY= req.body.R_KEY;
     ReceiptInfo.S_KEY= 2;
-    Db.queryINSERT(ReceiptInfo, function(err, resText){
+    Db.queryINSERT(ReceiptInfo, function(err){
         if(err){
+            console.log(err);
             res.send(err);
             return;
         }
