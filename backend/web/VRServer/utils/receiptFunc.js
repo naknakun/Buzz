@@ -229,7 +229,7 @@ function SetAgentReceiptInfoArray(result){
 
 exports.updateNumOfWaitingPatients = function(req, res){
     var OfficeInfo = req.body;
-    Db.queryUPDATENumOfWaitingPatients(InHospitalName, function(err){
+    Db.queryUPDATENumOfWaitingPatients(OfficeInfo, function(err){
         if(err){
             res.send(err);
             return;
