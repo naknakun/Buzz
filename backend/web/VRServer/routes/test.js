@@ -45,6 +45,12 @@ router.get('/test1', function(req, res){
 router.post('/dialogFlowStart', TextFunc.dialogFlowStart);
 router.post('/dialogFlow', TextFunc.dialogFlow);
 
+//agent 테스트
+//접수정보리스트 get
+router.post('/getAgentReceiptList', receipt.getAgentReceiptList);
+//대기열 정보 update
+router.post('/updateNumOfWaitingPatients', receipt.updateNumOfWaitingPatients);
+
 //db query 테스트
 router.get('/getdata', receipt.waitlist);
 //접수 등록

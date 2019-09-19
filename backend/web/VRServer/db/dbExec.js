@@ -250,3 +250,117 @@ function executeINSERTReception_Result(connection, InReceiptInfo, callback) {
     request.addParameter('S_KEY', TYPES.Int, InReceiptInfo.S_KEY);  
     connection.execSql(request);
 }
+
+exports.querySELECTAgentReceiptList = function(Inhosnum, response){    
+    var connection = new Connection(Dbcon.config);
+    connection.on('connect', function(err){
+        if(err){
+            response(err);
+        }
+        else{
+            var queryString = `
+                            SELECT 
+                                R.R_KEY, 
+                                (CASE WHEN RR.S_KEY IS NULL THEN 'RECEIPT' WHEN RR.S_KEY = 1 THEN 'CANCEL' END) AS S_KEY, 
+                                R.RECEPTION_TIME, R.R_KEY, R.H_KEY, M.M_KEY, M.FOREIGNER,
+                                O.O_NAME, M.M_NAME, M.PHONE, M.BIRTHDAY, M.GENDER
+                            FROM
+                                RECEPTION R
+                            INNER JOIN 
+                                MEMBER M
+                            ON
+                                R.M_KEY = M.M_KEY
+                            INNER JOIN
+                                OFFICE O
+                            ON
+                                R.O_KEY = O.O_KEY
+                            LEFT OUTER JOIN
+                                RECEPTION_RESULT RR
+                            ON
+                                R.R_KEY = RR.R_KEY
+                            WHERE
+                                (R.EDIT = 0)
+                                AND (R.H_KEY = '%s')
+                                AND ((S_KEY = 1) OR (S_KEY IS NULL))                    
+                                `;
+            var query = util.format(queryString, Inhosnum);
+            executeSELECT(connection, query, function(error, results) {
+                if(error){
+                    response(error);
+                }
+                else{
+                    var json = results;
+                    response(null, json);
+                }
+            });
+        }
+    });    
+};
+
+exports.queryUPDATENumOfWaitingPatients = function(InOfficeInfo, response){    
+    var connection = new Connection(Dbcon.config);
+    connection.on('connect', function(err){
+        if(err){
+            response(err);
+        }
+        else{
+            var querystring = `
+                UPDATE 
+                    OFFICE
+                SET 
+                    PATIENT_COUNT = %s, 
+                    LAST_UPDATE_DATE = [DBO].[dReturnDate](getdate())
+                WHERE 
+                    (O_NAME = '%s')
+                    AND (H_KEY = '%s');
+            `
+            var query = "";
+            InOfficeInfo.WAITCOUNTS.forEach(element => {
+                query = query + util.format(querystring, element.WAITCOUNT, element.OFFICE, InOfficeInfo.HOSNUM);
+            });
+            
+            var request = new Request(
+                query, 
+                function(error) {
+                    if (error) {
+                        return response(error);
+                    }
+                    response(null);
+                }
+            );
+            connection.execSql(request);
+        }
+    });    
+};
+
+exports.queryUPDATERECEPTIONEdit = function(EditType, InR_KEYList, response){    
+    var connection = new Connection(Dbcon.config);
+    connection.on('connect', function(err){
+        if(err){
+            response(err);
+        }
+        else{
+            var querystring = `
+                        UPDATE
+                            RECEPTION
+                        SET
+                            EDIT = %d
+                        WHERE
+                            R_KEY IN (%s);
+            `
+            var query = "";
+            query = util.format(querystring, EditType, InR_KEYList);
+            
+            var request = new Request(
+                query, 
+                function(error) {
+                    if (error) {
+                        return response(error);
+                    }
+                    response(null);
+                }
+            );
+            connection.execSql(request);
+        }
+    });    
+};

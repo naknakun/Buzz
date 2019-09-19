@@ -71,9 +71,18 @@ exports.Cancelreceipt = function(InMemberid, res){
                         return;
                     }
                     else{
-                        ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
-                        res.send(ResResult);
-                        return;
+                        var R_KEYList = new Array();
+                        result.forEach(element => {
+                            R_KEYList.push(element.R_KEY);
+                        });
+                        Db.queryUPDATERECEPTIONEdit(0, R_KEYList, function(err){
+                            if(err)
+                                console.log(err);
+                            
+                            ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
+                            res.send(ResResult);
+                            return;
+                        });                        
                     }
                 });
             }
@@ -163,3 +172,71 @@ function SetOfficeInfoArray(result){
     
     return AOfficeInfoArray;
 }
+
+exports.getAgentReceiptList = function(req, res){
+    var hosnum = req.body.hosnum;
+    Db.querySELECTAgentReceiptList(hosnum, function(err, result){
+        if(err){
+            res.send(err);
+            return;
+        }
+        else{
+            if(result.length == 0){              
+                res.send({});
+                return;
+            }
+            else{
+                var R_KEYList = new Array();
+                result.forEach(element => {
+                    R_KEYList.push(element.R_KEY);
+                });
+                Db.queryUPDATERECEPTIONEdit(1, R_KEYList, function(err){
+                    if(err)
+                        console.log(err);
+                    
+                    res.send(SetAgentReceiptInfoArray(result));
+                    return;
+                });
+            }
+        }
+    });
+};
+
+function SetAgentReceiptInfoArray(result){
+    var AReceiptInfoArray = new Array();             
+    var AReceiptInfo;
+
+    result.forEach(element => {
+        AReceiptInfo = new Object();
+                
+        AReceiptInfo.operation = element.S_KEY;
+        AReceiptInfo.createdAt = element.RECEPTION_TIME;
+        AReceiptInfo._id = element.R_KEY;
+        AReceiptInfo.hospital = element.H_KEY;
+        AReceiptInfo.userId = element.M_KEY;
+        AReceiptInfo.nationalInfo = element.FOREIGNER ? 1:0;
+        AReceiptInfo.roomTitle = element.O_NAME;
+        AReceiptInfo.userName = element.M_NAME;
+        AReceiptInfo.userPhone = element.PHONE;
+        AReceiptInfo.birthDate = element.BIRTHDAY;
+        AReceiptInfo.gender = element.GENDER;        
+
+        AReceiptInfoArray.push(AReceiptInfo);
+    });
+    
+    return AReceiptInfoArray;
+}
+
+exports.updateNumOfWaitingPatients = function(req, res){
+    var OfficeInfo = req.body;
+    Db.queryUPDATENumOfWaitingPatients(InHospitalName, function(err){
+        if(err){
+            res.send(err);
+            return;
+        }
+        else{
+            res.send('OK');
+            return
+        }
+    });
+};
