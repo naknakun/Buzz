@@ -240,3 +240,19 @@ exports.updateNumOfWaitingPatients = function(req, res){
         }
     });
 };
+
+exports.FinishReceip = function(req, res){
+    var ReceiptInfo = new Object();
+    ReceiptInfo.R_KEY= req.body.R_KEY;
+    ReceiptInfo.S_KEY= 2;
+    Db.queryINSERT(ReceiptInfo, function(err, resText){
+        if(err){
+            res.send(err);
+            return;
+        }
+        else{
+            res.send('OK');
+            return
+        }
+    });
+};

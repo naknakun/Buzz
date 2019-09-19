@@ -50,6 +50,8 @@ router.post('/dialogFlow', TextFunc.dialogFlow);
 router.post('/getAgentReceiptList', receipt.getAgentReceiptList);
 //대기열 정보 update
 router.post('/updateNumOfWaitingPatients', receipt.updateNumOfWaitingPatients);
+//예약 완료 INSERT
+router.post('/FinishReceip', receipt.FinishReceip);
 
 //db query 테스트
 router.get('/getdata', receipt.waitlist);
