@@ -48,6 +48,8 @@ router.post('/dialogFlow', TextFunc.dialogFlow);
 //agent 테스트
 //접수정보리스트 get
 router.post('/getAgentReceiptList', receipt.getAgentReceiptList);
+//접수정보리스트 getCheck
+router.post('/getAgentReceiptListCheck', receipt.getAgentReceiptListCheck);
 //대기열 정보 update
 router.post('/updateNumOfWaitingPatients', receipt.updateNumOfWaitingPatients);
 //예약 완료 INSERT

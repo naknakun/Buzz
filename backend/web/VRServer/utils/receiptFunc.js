@@ -134,6 +134,19 @@ exports.Checkreceipt = function(InMemberid, res){
     });
 }
 
+exports.getAgentReceiptListCheck = function(req, res){
+    var R_KEYList = req.body.R_KEY;
+    Db.queryUPDATERECEPTIONEdit(1, R_KEYList, function(err){
+        if(err){
+            console.log(err);
+            res.send('FAIL');
+            return;
+        }
+        res.send('OK');
+        return;
+    });
+}
+
 exports.CheckNumOfWaitingPatients = function(InHospitalName, res){
     Db.querySELECTOFFICE(InHospitalName, function(err, result){
         if(err){
@@ -186,17 +199,8 @@ exports.getAgentReceiptList = function(req, res){
                 return;
             }
             else{
-                var R_KEYList = new Array();
-                result.forEach(element => {
-                    R_KEYList.push(element.R_KEY);
-                });
-                Db.queryUPDATERECEPTIONEdit(1, R_KEYList, function(err){
-                    if(err)
-                        console.log(err);
-                    
-                    res.send(SetAgentReceiptInfoArray(result));
-                    return;
-                });
+                res.send(SetAgentReceiptInfoArray(result));
+                return;
             }
         }
     });
