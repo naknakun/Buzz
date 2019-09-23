@@ -6,3 +6,7 @@ dbconfig.js
 
 #DialogFlow
 Buzz-0a0eda1755de.json
+
+#azure
+.vscode/settings.json
+.deployment
