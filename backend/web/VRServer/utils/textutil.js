@@ -91,9 +91,10 @@ exports.dialogFlowStart = function(req, res){
 function SetReciptInfo(RowParameters, memberId){
   var Parameters = {clinicName:'', date:'', time:'', patientId:''};
   Parameters.clinicName = RowParameters.ClinicName.stringValue; 
-  var datestr = RowParameters.time.stringValue;
+  var datestr = RowParameters.date.stringValue;
+  var timestr = RowParameters.time.stringValue;
   Parameters.date = datestr.substr(0, 10); 
-  Parameters.time = datestr.substr(11, 8); 
+  Parameters.time = timestr.substr(11, 8); 
   Parameters.MEMBERID = memberId;
   return Parameters;
 }
