@@ -1,5 +1,6 @@
 var Db = require('../db/dbExec');
 var responseFunc = require('./response');
+var TypeConst = require('../Common/Const/TypeConst');
 
 exports.waitlist = function(req, res){
     Db.querySELECT('OFFICE', function(err, result){
@@ -31,18 +32,18 @@ exports.Makereceipt = function(ARowReceiptInfo, res){
         }
         else{     
             if(result.length == 0){                
-                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, "병원정보와 MEMBERID에 매칭되는 정보가 없습니다.");
+                ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogFinish, "병원정보와 MEMBERID에 매칭되는 정보가 없습니다.");
                 res.send(ResResult);
                 return;
             }
             else{
-                Db.queryINSERT(SetReceiptInfo(result, ARowReceiptInfo, 0), function(err, resText){
+                Db.queryINSERT(SetReceiptInfo(result, ARowReceiptInfo, TypeConst.StateType.Reservation), function(err, resText){
                     if(err){
                         res.send(err);
                         return;
                     }
                     else{
-                        ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
+                        ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogFinish, resText);
                         res.send(ResResult);
                         return;
                     }
@@ -60,12 +61,12 @@ exports.Cancelreceipt = function(InMemberid, res){
         }
         else{
             if(result.length == 0){                
-                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, "예약 내역이 존재하지 않습니다.");
+                ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogFinish, "예약 내역이 존재하지 않습니다.");
                 res.send(ResResult);
                 return;
             }
             else{
-                Db.queryINSERT(SetReceiptInfo(result, null, 1), function(err, resText){
+                Db.queryINSERT(SetReceiptInfo(result, null, TypeConst.StateType.ReservationCancel), function(err, resText){
                     if(err){
                         res.send(err);
                         return;
@@ -79,7 +80,7 @@ exports.Cancelreceipt = function(InMemberid, res){
                             if(err)
                                 console.log(err);
                             
-                            ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
+                            ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogFinish, resText);
                             res.send(ResResult);
                             return;
                         });                        
@@ -120,13 +121,13 @@ exports.Checkreceipt = function(InMemberid, res){
         }
         else{
             if(result.length == 0){                
-                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, "예약 내역이 존재하지 않습니다.");
+                ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogFinish, "예약 내역이 존재하지 않습니다.");
                 res.send(ResResult);
                 return;
             }
             else{                
-                resText = responseFunc.GetReceiptResText(SetReceiptInfo(result, null, 0));  
-                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
+                resText = responseFunc.GetReceiptResText(SetReceiptInfo(result, null, TypeConst.StateType.Reservation));  
+                ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogFinish, resText);
                 res.send(ResResult);
                 return;
             }
@@ -156,13 +157,13 @@ exports.CheckNumOfWaitingPatients = function(InHospitalName, res){
         }
         else{
             if(result.length == 0){                
-                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, "해당 요양기관에 대한 대기열정보가 존재하지 않습니다.");
+                ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogFinish, "해당 요양기관에 대한 대기열정보가 존재하지 않습니다.");
                 res.send(ResResult);
                 return;
             }
             else{                
                 resText = responseFunc.GetCNOPResText(SetOfficeInfoArray(result));  
-                ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, resText);
+                ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogFinish, resText);
                 res.send(ResResult);
                 return;
             }
@@ -249,7 +250,7 @@ exports.updateNumOfWaitingPatients = function(req, res){
 exports.FinishReceipt = function(req, res){
     var ReceiptInfo = new Object();
     ReceiptInfo.R_KEY= req.body.R_KEY;
-    ReceiptInfo.S_KEY= 2;
+    ReceiptInfo.S_KEY= TypeConst.StateType.ReservationFinish;
     Db.queryINSERT(ReceiptInfo, function(err){
         if(err){
             console.log(err);

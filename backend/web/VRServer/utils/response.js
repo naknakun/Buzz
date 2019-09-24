@@ -1,5 +1,7 @@
 var util = require("util");
 
+var TypeConst = require("../Common/Const/TypeConst");
+
 exports.GetdialogRes = function(resType, TEXT){
     var response = {TYPE:'', TEXT:''};
     response.TYPE = resType;
@@ -20,9 +22,9 @@ exports.GetCNOPResText = function(InOfficeInfoArray){
 }
 
 exports.GetReceiptResText = function(ReceiptInfo){
-    if(ReceiptInfo.S_KEY == 0)
+    if(ReceiptInfo.S_KEY == TypeConst.StateType.Reservation)
         var resTextBorn = "%s님 %s에 %s에 예약 되었습니다.";
-    else if(ReceiptInfo.S_KEY == 1)
+    else if(ReceiptInfo.S_KEY == TypeConst.StateType.ReservationCancel)
         var resTextBorn = "%s님 %s에 %s에 예약취소 되었습니다."; 
 
     var resText = util.format(resTextBorn, 
@@ -31,12 +33,3 @@ exports.GetReceiptResText = function(ReceiptInfo){
                               ReceiptInfo.RECEPTION_TIME_TEXT);
     return resText;
 }
-
-const resType = Object.freeze(
-    {
-        "error" : -1,
-        "DialogUnFinish" : 0,
-        "DialogFinish" : 1
-    }
-);
-exports.resType = resType;

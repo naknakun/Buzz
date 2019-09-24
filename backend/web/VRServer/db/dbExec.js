@@ -5,6 +5,7 @@ var util = require("util");
 
 var responseFunc = require('../utils/response');
 var Dbcon = require('./dbCon');
+var TypeConst = require("../Common/Const/TypeConst");
 
 exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){    
     var connection = new Connection(Dbcon.config);
@@ -172,10 +173,10 @@ exports.queryINSERT = function(InReceiptInfo, response){
             response(err);
         }
         else{
-            if(InReceiptInfo.S_KEY == 0){
+            if(InReceiptInfo.S_KEY == TypeConst.StateType.Reservation){
                 executeINSERT(connection, InReceiptInfo, response);
             }
-            else if(InReceiptInfo.S_KEY == 1 || InReceiptInfo.S_KEY == 2){
+            else if(InReceiptInfo.S_KEY == TypeConst.StateType.ReservationCancel || InReceiptInfo.S_KEY == TypeConst.StateType.ReservationFinish){
                 executeINSERTReception_Result(connection, InReceiptInfo, response);
             }            
         }
@@ -272,11 +273,11 @@ function executeINSERTReception_Result(connection, InReceiptInfo, callback) {
             if (error) {
                 return callback(error);
             }
-            if(InReceiptInfo.S_KEY == 1){
+            if(InReceiptInfo.S_KEY == TypeConst.StateType.ReservationCancel){
                 resText = responseFunc.GetReceiptResText(InReceiptInfo);
                 callback(null, resText);
             }
-            else if(InReceiptInfo.S_KEY == 2){
+            else if(InReceiptInfo.S_KEY == TypeConst.StateType.ReservationFinish){
                 callback(null);
             }         
         }

@@ -2,6 +2,7 @@ var API_Call = require('./DFCall')('another');
 var dialog = require('./dialogtest');
 var receipt = require('./receiptFunc');
 var responseFunc = require('./response');
+var TypeConst = require('../Common/Const/TypeConst');
 
 exports.calltext = function(req, res){
     console.log(req.body.id + ', ' + req.body.text);
@@ -59,7 +60,7 @@ exports.dialogFlow = function(req, res){
             return;
           }
           default:{
-            ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogFinish, result.fulfillmentText);
+            ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogFinish, result.fulfillmentText);
             res.send(ResResult);
             return;
           }
@@ -67,13 +68,13 @@ exports.dialogFlow = function(req, res){
       }
       //대화 완료 X
       else{
-        ResResult = responseFunc.GetdialogRes(responseFunc.resType.DialogUnFinish, result.fulfillmentText);
+        ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogUnFinish, result.fulfillmentText);
         res.send(ResResult);
         return;
       }      
     }
     else{
-      ResResult = responseFunc.GetdialogRes(responseFunc.resType.error, '매칭되는 intent가 없습니다.');
+      ResResult = responseFunc.GetdialogRes(TypeConst.resType.error, '매칭되는 intent가 없습니다.');
       res.send(ResResult);
       return;
     }
