@@ -53,7 +53,7 @@ router.post('/getAgentReceiptListCheck', receipt.getAgentReceiptListCheck);
 //대기열 정보 update
 router.post('/updateNumOfWaitingPatients', receipt.updateNumOfWaitingPatients);
 //예약 완료 INSERT
-router.post('/FinishReceip', receipt.FinishReceip);
+router.post('/FinishReceipt', receipt.FinishReceipt);
 
 //db query 테스트
 router.get('/getdata', receipt.waitlist);

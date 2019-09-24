@@ -58,13 +58,28 @@ exports.querySELECTReceiptUnFinish = function(InMemberid, response){
                                     MEMBER M
                                 ON
                                     R.M_KEY = M.M_KEY
-                                LEFT OUTER JOIN
-                                    RECEPTION_RESULT RR
+                                INNER JOIN
+                                    (SELECT 
+                                        TMPRR.RR_KEY,
+                                        TMPRR.R_KEY,
+                                        TMPRR.S_KEY,
+                                        TMPRR.REQUEST_TIME
+                                    FROM
+                                        RECEPTION_RESULT AS TMPRR
+                                    INNER JOIN	
+                                        (SELECT 
+                                            R_KEY, MAX(REQUEST_TIME) AS REQUEST_TIME
+                                        FROM 
+                                            RECEPTION_RESULT
+                                        GROUP BY
+                                            R_KEY) AS G_RR
+                                    ON
+                                        TMPRR.REQUEST_TIME = G_RR.REQUEST_TIME) AS RR
                                 ON
                                     R.R_KEY = RR.R_KEY
                                 WHERE
                                     (M.M_ID = '%s')
-                                    AND (S_KEY IS NULL)
+                                    AND (S_KEY = 0)
                                 ORDER BY
                                     RECEPTION_TIME DESC;                     
                                 `;
@@ -206,7 +221,21 @@ function executeINSERT(connection, InReceiptInfo, callback) {
         @H_KEY, 
         @O_KEY, 
         @RECEPTION_TIME
-    );`
+    );
+    DECLARE @R_KEY int
+    SET @R_KEY = (SELECT @@IDENTITY)   
+
+    INSERT INTO [DBO].[RECEPTION_RESULT]
+    (
+        R_KEY,
+        S_KEY
+    ) 
+    VALUES 
+    (
+        @R_KEY, 
+        0
+    );
+    `
     var request = new Request(
         query, 
         function(error) {
@@ -221,6 +250,7 @@ function executeINSERT(connection, InReceiptInfo, callback) {
     request.addParameter('H_KEY', TYPES.NVarChar, InReceiptInfo.H_KEY);  
     request.addParameter('O_KEY', TYPES.Int, InReceiptInfo.O_KEY);  
     request.addParameter('RECEPTION_TIME', TYPES.DateTime, new Date(InReceiptInfo.RECEPTION_TIME));
+
     connection.execSql(request);
 }
 
@@ -266,7 +296,7 @@ exports.querySELECTAgentReceiptList = function(Inhosnum, response){
             var queryString = `
                             SELECT 
                                 R.R_KEY, 
-                                (CASE WHEN RR.S_KEY IS NULL THEN 'RECEIPT' WHEN RR.S_KEY = 1 THEN 'CANCEL' END) AS S_KEY, 
+                                (CASE WHEN RR.S_KEY = 0 THEN 'RECEIPT' WHEN RR.S_KEY = 1 THEN 'CANCEL' END) AS S_KEY, 
                                 R.RECEPTION_TIME, R.R_KEY, R.H_KEY, M.M_KEY, M.FOREIGNER,
                                 O.O_NAME, M.M_NAME, M.PHONE, M.BIRTHDAY, M.GENDER
                             FROM
@@ -279,14 +309,29 @@ exports.querySELECTAgentReceiptList = function(Inhosnum, response){
                                 OFFICE O
                             ON
                                 R.O_KEY = O.O_KEY
-                            LEFT OUTER JOIN
-                                RECEPTION_RESULT RR
+                            INNER JOIN
+                                (SELECT 
+                                    TMPRR.RR_KEY,
+                                    TMPRR.R_KEY,
+                                    TMPRR.S_KEY,
+                                    TMPRR.REQUEST_TIME
+                                FROM
+                                    RECEPTION_RESULT AS TMPRR
+                                INNER JOIN	
+                                    (SELECT 
+                                        R_KEY, MAX(REQUEST_TIME) AS REQUEST_TIME
+                                    FROM 
+                                        RECEPTION_RESULT
+                                    GROUP BY
+                                        R_KEY) AS G_RR
+                                ON
+                                    TMPRR.REQUEST_TIME = G_RR.REQUEST_TIME) AS RR
                             ON
                                 R.R_KEY = RR.R_KEY
                             WHERE
                                 (R.EDIT = 0)
                                 AND (R.H_KEY = '%s')
-                                AND ((S_KEY = 1) OR (S_KEY IS NULL))                    
+                                AND (S_KEY IN (0, 1))                
                                 `;
             var query = util.format(queryString, Inhosnum);
             executeSELECT(connection, query, function(error, results) {

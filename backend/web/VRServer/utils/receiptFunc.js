@@ -135,6 +135,7 @@ exports.Checkreceipt = function(InMemberid, res){
 }
 
 exports.getAgentReceiptListCheck = function(req, res){
+    console.log(req.body.R_KEY);
     var R_KEYList = req.body.R_KEY;
     Db.queryUPDATERECEPTIONEdit(1, R_KEYList, function(err){
         if(err){
@@ -245,7 +246,7 @@ exports.updateNumOfWaitingPatients = function(req, res){
     });
 };
 
-exports.FinishReceip = function(req, res){
+exports.FinishReceipt = function(req, res){
     var ReceiptInfo = new Object();
     ReceiptInfo.R_KEY= req.body.R_KEY;
     ReceiptInfo.S_KEY= 2;
