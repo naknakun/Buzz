@@ -215,9 +215,8 @@ function executeINSERT(connection, InReceiptInfo, callback) {
         function(error) {
             if (error) {
                 return callback(error);
-            }
-            resText = responseFunc.GetReceiptResText(InReceiptInfo);
-            callback(null, resText);
+            }            
+            return callback(null);
         }
     );
     request.addParameter('M_KEY', TYPES.Int, InReceiptInfo.M_KEY);  
@@ -246,13 +245,7 @@ function executeINSERTReception_Result(connection, InReceiptInfo, callback) {
             if (error) {
                 return callback(error);
             }
-            if(InReceiptInfo.S_KEY == TypeConst.StateType.ReservationCancel){
-                resText = responseFunc.GetReceiptResText(InReceiptInfo);
-                callback(null, resText);
-            }
-            else if(InReceiptInfo.S_KEY == TypeConst.StateType.ReservationFinish){
-                callback(null);
-            }         
+            return callback(null);    
         }
     );
     request.addParameter('R_KEY', TYPES.Int, InReceiptInfo.R_KEY);  

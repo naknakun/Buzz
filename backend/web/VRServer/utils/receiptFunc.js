@@ -15,12 +15,14 @@ exports.Makereceipt = function(ARowReceiptInfo, res){
                 return;
             }
             else{
-                Db.queryINSERT(SetReceiptInfo(result, ARowReceiptInfo, TypeConst.StateType.Reservation), function(err, resText){
+                AReceiptInfo = SetReceiptInfo(result, ARowReceiptInfo, TypeConst.StateType.Reservation);
+                Db.queryINSERT(AReceiptInfo, function(err){
                     if(err){
                         res.send(err);
                         return;
                     }
                     else{
+                        resText = responseFunc.GetReceiptResText(AReceiptInfo);
                         ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogFinish, resText);
                         res.send(ResResult);
                         return;
@@ -44,7 +46,8 @@ exports.Cancelreceipt = function(InMemberid, res){
                 return;
             }
             else{
-                Db.queryINSERT(SetReceiptInfo(result, null, TypeConst.StateType.ReservationCancel), function(err, resText){
+                AReceiptInfo = SetReceiptInfo(result, null, TypeConst.StateType.ReservationCancel);
+                Db.queryINSERT(AReceiptInfo, function(err){
                     if(err){
                         res.send(err);
                         return;
@@ -58,6 +61,7 @@ exports.Cancelreceipt = function(InMemberid, res){
                             if(err)
                                 console.log(err);
                             
+                            resText = responseFunc.GetReceiptResText(AReceiptInfo);
                             ResResult = responseFunc.GetdialogRes(TypeConst.resType.DialogFinish, resText);
                             res.send(ResResult);
                             return;
