@@ -139,33 +139,6 @@ exports.querySELECTOFFICE = function(InHospitalName, response){
     });    
 };
 
-exports.querySELECT = function(tname, response){    
-    var connection = new Connection(Dbcon.config);
-    connection.on('connect', function(err){
-        if(err){
-            response(err);
-        }
-        else{            
-            var queryString = `
-                                SELECT
-                                    *
-                                FROM
-                                    [%s]                           
-                                `;
-            var query = util.format(queryString, tname);
-            executeSELECT(connection, query, function(error, results) {
-                if(error){
-                    response(error);
-                }
-                else{
-                    var json = JSON.stringify(results);
-                    response(null, json);
-                }
-            });
-        }
-    });    
-};
-
 exports.queryINSERT = function(InReceiptInfo, response){
     var connection = new Connection(Dbcon.config);
     connection.on('connect', function(err){
@@ -178,7 +151,7 @@ exports.queryINSERT = function(InReceiptInfo, response){
             }
             else if(InReceiptInfo.S_KEY == TypeConst.StateType.ReservationCancel || InReceiptInfo.S_KEY == TypeConst.StateType.ReservationFinish){
                 executeINSERTReception_Result(connection, InReceiptInfo, response);
-            }            
+            }           
         }
     });    
 };

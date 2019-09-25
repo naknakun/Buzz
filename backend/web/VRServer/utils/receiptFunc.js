@@ -2,28 +2,6 @@ var Db = require('../db/dbExec');
 var responseFunc = require('./response');
 var TypeConst = require('../Common/Const/TypeConst');
 
-exports.waitlist = function(req, res){
-    Db.querySELECT('OFFICE', function(err, result){
-        if(err){
-            res.send(err);
-        }
-        else{
-            res.send(result);
-        }
-    });
-};
-
-exports.receipt = function(req, res){
-    Db.queryINSERT(function(err){
-        if(err){
-            res.send(err);
-        }
-        else{
-            res.send('정상 등록되었습니다.');
-        }
-    });
-};
-
 exports.Makereceipt = function(ARowReceiptInfo, res){
     Db.querySELECTReceiptInfo(ARowReceiptInfo, function(err, result){
         if(err){

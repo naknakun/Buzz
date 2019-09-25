@@ -55,13 +55,6 @@ router.post('/updateNumOfWaitingPatients', receipt.updateNumOfWaitingPatients);
 //예약 완료 INSERT
 router.post('/FinishReceipt', receipt.FinishReceipt);
 
-//db query 테스트
-router.get('/getdata', receipt.waitlist);
-//접수 등록
-// router.post('/MakeReservation', receipt.Makereceipt);
-router.get('/MakeReservation1', receipt.receipt);
-
-
 // 각 기능 테스트
 router.post('/Makereceipt', function(req, res){
   var info = JSON.parse(req.body);
