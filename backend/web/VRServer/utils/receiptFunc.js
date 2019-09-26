@@ -85,12 +85,16 @@ function SetReceiptInfo(result, ARowReceiptInfo, State){
     if(ARowReceiptInfo == null){
         var Reception_time = result[0].RECEPTION_TIME.toISOString();
         AReceiptInfo.RECEPTION_TIME = Reception_time.substr(0, 10) + 'T' + Reception_time.substr(11, 8) + 'Z';
-        AReceiptInfo.RECEPTION_TIME_TEXT = Reception_time.substr(0, 10) + ' ' + Reception_time.substr(11, 8);
-        AReceiptInfo.R_KEY = result[0].R_KEY; 
+        var date = result[0].RECEPTION_TIME;
+        AReceiptInfo.RECEPTION_TIME_TEXT = date.getUTCFullYear() + '년' + (date.getUTCMonth()+1) + '월' + date.getUTCDate() + '일 ' 
+                                            + date.getUTCHours() + '시' + date.getUTCMinutes() + '분';
+        AReceiptInfo.R_KEY = result[0].R_KEY;
     }
     else{
         AReceiptInfo.RECEPTION_TIME = ARowReceiptInfo.date + 'T' + ARowReceiptInfo.time + 'Z';
-        AReceiptInfo.RECEPTION_TIME_TEXT = ARowReceiptInfo.date + ' ' + ARowReceiptInfo.time; 
+        var date = new Date(AReceiptInfo.RECEPTION_TIME);
+        AReceiptInfo.RECEPTION_TIME_TEXT = date.getUTCFullYear() + '년' + (date.getUTCMonth()+1) + '월' + date.getUTCDate() + '일 ' 
+                                            + date.getUTCHours() + '시' + date.getUTCMinutes() + '분';
     }
     return AReceiptInfo;
 }
