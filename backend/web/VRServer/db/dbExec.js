@@ -16,13 +16,13 @@ exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){
         else{
             var queryString = `
                                 SELECT
-                                    H.H_KEY, M.M_KEY, O.O_KEY, H.H_NAME, M.M_NAME
+                                    H.HOSNUM, M.MEMBER_KEY, O.OFFICE_KEY, H.HOSNAME, M.NAME
                                 FROM
                                     [HOSPITAL] H, [MEMBER] M, [OFFICE] O
                                 WHERE
-                                    H.H_NAME = '%s'
-                                    AND M.M_ID = '%s'
-                                    AND O.O_NAME = '%s'                            
+                                    H.HOSNAME = '%s'
+                                    AND M.MEMBER_ID = '%s'
+                                    AND O.OFFICE_NAME = '%s'                            
                                 `;
             var query = util.format(queryString, InRowReceiptInfo.clinicName, InRowReceiptInfo.MEMBERID, '진료실');
             executeSELECT(connection, query, function(error, results) {
@@ -47,40 +47,40 @@ exports.querySELECTReceiptUnFinish = function(InMemberid, response){
         else{
             var queryString = `
                                 SELECT 
-                                    TOP 1 R.R_KEY, R.H_KEY, R.M_KEY, O_KEY, RECEPTION_TIME,
-                                    H_NAME, M_NAME, S_KEY
+                                    TOP 1 W.WORKLIST_KEY, W.HOSNUM, W.MEMBER_KEY, OFFICE_KEY, RECEPTION_TIME,
+                                    HOSNAME, MEMBER_NAME, STATE_KEY
                                 FROM
-                                    RECEPTION R
+                                    WORKLIST W
                                  INNER JOIN
                                     HOSPITAL H
                                 ON 
-                                    R.H_KEY = H.H_KEY
+                                    W.HOSNUM = H.HOSNUM
                                 INNER JOIN 
                                     MEMBER M
                                 ON
-                                    R.M_KEY = M.M_KEY
+                                    W.MEMBER_KEY = M.MEMBER_KEY
                                 INNER JOIN
                                     (SELECT 
-                                        TMPRR.RR_KEY,
-                                        TMPRR.R_KEY,
-                                        TMPRR.S_KEY,
-                                        TMPRR.REQUEST_TIME
+                                        TMPWR.RESULT_KEY,
+                                        TMPWR.WORKLIST_KEY,
+                                        TMPWR.STATE_KEY,
+                                        TMPWR.REQUEST_TIME
                                     FROM
-                                        RECEPTION_RESULT AS TMPRR
+                                        WORKLIST_RESULT AS TMPWR
                                     INNER JOIN	
                                         (SELECT 
-                                            R_KEY, MAX(REQUEST_TIME) AS REQUEST_TIME
+                                            WORKLIST_KEY, MAX(REQUEST_TIME) AS REQUEST_TIME
                                         FROM 
-                                            RECEPTION_RESULT
+                                            WORKLIST_RESULT
                                         GROUP BY
-                                            R_KEY) AS G_RR
+                                            WORKLIST_KEY) AS G_WR
                                     ON
-                                        TMPRR.REQUEST_TIME = G_RR.REQUEST_TIME) AS RR
+                                        TMPWR.REQUEST_TIME = G_WR.REQUEST_TIME) AS WR
                                 ON
-                                    R.R_KEY = RR.R_KEY
+                                    W.WORKLIST_KEY = WR.WORKLIST_KEY
                                 WHERE
-                                    (M.M_ID = '%s')
-                                    AND (S_KEY = 0)
+                                    (M.MEMBER_ID = '%s')
+                                    AND (STATE_KEY = 0)
                                 ORDER BY
                                     RECEPTION_TIME DESC;                     
                                 `;
@@ -107,23 +107,23 @@ exports.querySELECTOFFICE = function(InHospitalName, response){
         else{
             var queryString = `
                                 SELECT
-                                    O_KEY,
-                                    O_NAME,
-                                    H.H_KEY,
+                                    OFFICE_KEY,
+                                    OFFICE_NAME,
+                                    H.HOSNUM,
                                     PATIENT_COUNT,
-                                    H_NAME
+                                    HOSNAME
                                 FROM
                                     [OFFICE] O
                                 INNER JOIN
                                     [HOSPITAL] H
                                 ON
-                                    O.H_KEY = H.H_KEY
+                                    O.HOSNUM = H.HOSNUM
                                 WHERE
-                                    (H.H_NAME = '%s')
+                                    (H.HOSNAME = '%s')
                                     AND (CONVERT(char(10), LAST_UPDATE_DATE, 126) =
                                         CONVERT(char(10), [DBO].[dReturnDate](getdate()),126))
                                 ORDER BY
-                                    O_KEY;                      
+                                    OFFICE_KEY;                      
                                 `;
             var query = util.format(queryString, InHospitalName);
             executeSELECT(connection, query, function(error, results) {
@@ -146,10 +146,10 @@ exports.queryINSERT = function(InReceiptInfo, response){
             response(err);
         }
         else{
-            if(InReceiptInfo.S_KEY == TypeConst.StateType.Reservation){
+            if(InReceiptInfo.STATE_KEY == TypeConst.StateType.Reservation){
                 executeINSERT(connection, InReceiptInfo, response);
             }
-            else if(InReceiptInfo.S_KEY == TypeConst.StateType.ReservationCancel || InReceiptInfo.S_KEY == TypeConst.StateType.ReservationFinish){
+            else if(InReceiptInfo.STATE_KEY == TypeConst.StateType.ReservationCancel || InReceiptInfo.STATE_KEY == TypeConst.StateType.ReservationFinish){
                 executeINSERTReception_Result(connection, InReceiptInfo, response);
             }           
         }
@@ -182,31 +182,31 @@ function executeSELECT(connection, query, callback) {
 
 function executeINSERT(connection, InReceiptInfo, callback) {
     var query = `
-    INSERT INTO [DBO].[RECEPTION]
+    INSERT INTO [DBO].[WORKLIST]
     (
-        M_KEY, 
-        H_KEY, 
-        O_KEY, 
+        MEMBER_KEY, 
+        HOSNUM, 
+        OFFICE_KEY, 
         RECEPTION_TIME
     ) 
     VALUES 
     (
-        @M_KEY, 
-        @H_KEY, 
-        @O_KEY, 
+        @MEMBER_KEY, 
+        @HOSNUM, 
+        @OFFICE_KEY, 
         @RECEPTION_TIME
     );
-    DECLARE @R_KEY int
-    SET @R_KEY = (SELECT @@IDENTITY)   
+    DECLARE @WORKLIST_KEY int
+    SET @WORKLIST_KEY = (SELECT @@IDENTITY)   
 
-    INSERT INTO [DBO].[RECEPTION_RESULT]
+    INSERT INTO [DBO].[WORKLIST_RESULT]
     (
-        R_KEY,
-        S_KEY
+        WORKLIST_KEY,
+        STATE_KEY
     ) 
     VALUES 
     (
-        @R_KEY, 
+        @WORKLIST_KEY, 
         0
     );
     `
@@ -219,9 +219,9 @@ function executeINSERT(connection, InReceiptInfo, callback) {
             return callback(null);
         }
     );
-    request.addParameter('M_KEY', TYPES.Int, InReceiptInfo.M_KEY);  
-    request.addParameter('H_KEY', TYPES.NVarChar, InReceiptInfo.H_KEY);  
-    request.addParameter('O_KEY', TYPES.Int, InReceiptInfo.O_KEY);  
+    request.addParameter('MEMBER_KEY', TYPES.Int, InReceiptInfo.MEMBER_KEY);  
+    request.addParameter('HOSNUM', TYPES.NVarChar, InReceiptInfo.HOSNUM);  
+    request.addParameter('OFFICE_KEY', TYPES.Int, InReceiptInfo.OFFICE_KEY);  
     request.addParameter('RECEPTION_TIME', TYPES.DateTime, new Date(InReceiptInfo.RECEPTION_TIME));
 
     connection.execSql(request);
@@ -229,15 +229,15 @@ function executeINSERT(connection, InReceiptInfo, callback) {
 
 function executeINSERTReception_Result(connection, InReceiptInfo, callback) {
     var query = `
-    INSERT INTO [DBO].[RECEPTION_RESULT]
+    INSERT INTO [DBO].[WORKLIST_RESULT]
     (
-        R_KEY,
-        S_KEY
+        WORKLIST_KEY,
+        STATE_KEY
     ) 
     VALUES 
     (
-        @R_KEY, 
-        @S_KEY
+        @WORKLIST_KEY, 
+        @STATE_KEY
     );`
     var request = new Request(
         query, 
@@ -248,8 +248,8 @@ function executeINSERTReception_Result(connection, InReceiptInfo, callback) {
             return callback(null);    
         }
     );
-    request.addParameter('R_KEY', TYPES.Int, InReceiptInfo.R_KEY);  
-    request.addParameter('S_KEY', TYPES.Int, InReceiptInfo.S_KEY);  
+    request.addParameter('WORKLIST_KEY', TYPES.Int, InReceiptInfo.WORKLIST_KEY);  
+    request.addParameter('STATE_KEY', TYPES.Int, InReceiptInfo.STATE_KEY);  
     connection.execSql(request);
 }
 
@@ -262,43 +262,43 @@ exports.querySELECTAgentReceiptList = function(Inhosnum, response){
         else{
             var queryString = `
                             SELECT 
-                                R.R_KEY, 
-                                (CASE WHEN RR.S_KEY = 0 THEN 'RECEIPT' WHEN RR.S_KEY = 1 THEN 'CANCEL' END) AS S_KEY, 
-                                R.RECEPTION_TIME, R.R_KEY, R.H_KEY, M.M_KEY, M.FOREIGNER,
-                                O.O_NAME, M.M_NAME, M.PHONE, M.BIRTHDAY, M.GENDER
+                                W.WORKLIST_KEY, 
+                                (CASE WHEN RR.STATE_KEY = 0 THEN 'RECEIPT' WHEN RR.STATE_KEY = 1 THEN 'CANCEL' END) AS STATE_KEY, 
+                                W.RECEPTION_TIME, W.HOSNUM, M.MEMBER_KEY, M.FOREIGNER,
+                                O.OFFICE_NAME, M.MEMBER_NAME, M.PHONE, M.BIRTHDAY, M.GENDER
                             FROM
-                                RECEPTION R
+                                WORKLIST W
                             INNER JOIN 
                                 MEMBER M
                             ON
-                                R.M_KEY = M.M_KEY
+                                W.MEMBER_KEY = M.MEMBER_KEY
                             INNER JOIN
                                 OFFICE O
                             ON
-                                R.O_KEY = O.O_KEY
+                                W.OFFICE_KEY = O.OFFICE_KEY
                             INNER JOIN
                                 (SELECT 
-                                    TMPRR.RR_KEY,
-                                    TMPRR.R_KEY,
-                                    TMPRR.S_KEY,
-                                    TMPRR.REQUEST_TIME
+                                    TMPWR.RESULT_KEY,
+                                    TMPWR.WORKLIST_KEY,
+                                    TMPWR.STATE_KEY,
+                                    TMPWR.REQUEST_TIME
                                 FROM
-                                    RECEPTION_RESULT AS TMPRR
+                                    WORKLIST_RESULT AS TMPWR
                                 INNER JOIN	
                                     (SELECT 
-                                        R_KEY, MAX(REQUEST_TIME) AS REQUEST_TIME
+                                        WORKLIST_KEY, MAX(REQUEST_TIME) AS REQUEST_TIME
                                     FROM 
-                                        RECEPTION_RESULT
+                                        WORKLIST_RESULT
                                     GROUP BY
-                                        R_KEY) AS G_RR
+                                        WORKLIST_KEY) AS G_WR
                                 ON
-                                    TMPRR.REQUEST_TIME = G_RR.REQUEST_TIME) AS RR
+                                    TMPWR.REQUEST_TIME = G_WR.REQUEST_TIME) AS WR
                             ON
-                                R.R_KEY = RR.R_KEY
+                                W.WORKLIST_KEY = WR.WORKLIST_KEY
                             WHERE
-                                (R.EDIT = 0)
-                                AND (R.H_KEY = '%s')
-                                AND (S_KEY IN (0, 1))                
+                                (W.EDIT = 0)
+                                AND (W.HOSNUM = '%s')
+                                AND (STATE_KEY IN (0, 1))                
                                 `;
             var query = util.format(queryString, Inhosnum);
             executeSELECT(connection, query, function(error, results) {
@@ -328,8 +328,8 @@ exports.queryUPDATENumOfWaitingPatients = function(InOfficeInfo, response){
                     PATIENT_COUNT = %s, 
                     LAST_UPDATE_DATE = [DBO].[dReturnDate](getdate())
                 WHERE 
-                    (O_NAME = '%s')
-                    AND (H_KEY = '%s');
+                    (OFFICE_NAME = '%s')
+                    AND (HOSNUM = '%s');
             `
             var query = "";
             InOfficeInfo.WAITCOUNTS.forEach(element => {
@@ -350,7 +350,7 @@ exports.queryUPDATENumOfWaitingPatients = function(InOfficeInfo, response){
     });    
 };
 
-exports.queryUPDATERECEPTIONEdit = function(EditType, InR_KEYList, response){    
+exports.queryUPDATERECEPTIONEdit = function(EditType, WORKLIST, response){    
     var connection = new Connection(Dbcon.config);
     connection.on('connect', function(err){
         if(err){
@@ -359,14 +359,14 @@ exports.queryUPDATERECEPTIONEdit = function(EditType, InR_KEYList, response){
         else{
             var querystring = `
                         UPDATE
-                            RECEPTION
+                            WORKLIST
                         SET
                             EDIT = %d
                         WHERE
-                            R_KEY IN (%s);
+                            WORKLIST_KEY IN (%s);
             `
             var query = "";
-            query = util.format(querystring, EditType, InR_KEYList);
+            query = util.format(querystring, EditType, WORKLIST);
             
             var request = new Request(
                 query, 

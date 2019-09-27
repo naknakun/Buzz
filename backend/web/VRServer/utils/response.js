@@ -14,22 +14,22 @@ exports.GetCNOPResText = function(InOfficeInfoArray){
     var resText = "";
     InOfficeInfoArray.forEach(element => {
         resText = resText + util.format(resTextBorn,
-                                        element.H_NAME,
-                                        element.O_NAME,
+                                        element.HOSNAME,
+                                        element.OFFICE_NAME,
                                         element.PATIENT_COUNT) + " ";
     });
     return resText.trim();
 }
 
 exports.GetReceiptResText = function(ReceiptInfo){
-    if(ReceiptInfo.S_KEY == TypeConst.StateType.Reservation)
+    if(ReceiptInfo.STATE_KEY == TypeConst.StateType.Reservation)
         var resTextBorn = "%s님 %s에 %s에 예약 되었습니다.";
-    else if(ReceiptInfo.S_KEY == TypeConst.StateType.ReservationCancel)
+    else if(ReceiptInfo.STATE_KEY == TypeConst.StateType.ReservationCancel)
         var resTextBorn = "%s님 %s에 %s에 예약취소 되었습니다."; 
 
     var resText = util.format(resTextBorn, 
-                              ReceiptInfo.M_NAME, 
-                              ReceiptInfo.H_NAME, 
+                              ReceiptInfo.MEMBER_NAME, 
+                              ReceiptInfo.HOSNAME, 
                               ReceiptInfo.RECEPTION_TIME_TEXT);
     return resText;
 }

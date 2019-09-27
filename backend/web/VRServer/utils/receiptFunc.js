@@ -53,11 +53,11 @@ exports.Cancelreceipt = function(InMemberid, res){
                         return;
                     }
                     else{
-                        var R_KEYList = new Array();
+                        var WORKLIST = new Array();
                         result.forEach(element => {
-                            R_KEYList.push(element.R_KEY);
+                            WORKLIST.push(element.WORKLIST_KEY);
                         });
-                        Db.queryUPDATERECEPTIONEdit(0, R_KEYList, function(err){
+                        Db.queryUPDATERECEPTIONEdit(0, WORKLIST, function(err){
                             if(err)
                                 console.log(err);
                             
@@ -74,21 +74,21 @@ exports.Cancelreceipt = function(InMemberid, res){
 };
 
 function SetReceiptInfo(result, ARowReceiptInfo, State){
-    var AReceiptInfo = {M_KEY:'', H_KEY:'', O_KEY:'', S_KEY:'', RECEPTION_TIME:'', RECEPTION_TIME_TEXT:'',
-                         H_NAME:'', M_NAME:''};
-    AReceiptInfo.M_KEY = result[0].M_KEY; 
-    AReceiptInfo.H_KEY = result[0].H_KEY; 
-    AReceiptInfo.O_KEY = result[0].O_KEY; 
-    AReceiptInfo.H_NAME = result[0].H_NAME;
-    AReceiptInfo.M_NAME = result[0].M_NAME;
-    AReceiptInfo.S_KEY = State; 
+    var AReceiptInfo = {MEMBER_KEY:'', HOSNUM:'', OFFICE_KEY:'', STATE_KEY:'', RECEPTION_TIME:'', RECEPTION_TIME_TEXT:'',
+                         HOSNAME:'', MEMBER_NAME:''};
+    AReceiptInfo.MEMBER_KEY = result[0].MEMBER_KEY; 
+    AReceiptInfo.HOSNUM = result[0].HOSNUM; 
+    AReceiptInfo.OFFICE_KEY = result[0].OFFICE_KEY; 
+    AReceiptInfo.HOSNAME = result[0].HOSNAME;
+    AReceiptInfo.MEMBER_NAME = result[0].MEMBER_NAME;
+    AReceiptInfo.STATE_KEY = State; 
     if(ARowReceiptInfo == null){
         var Reception_time = result[0].RECEPTION_TIME.toISOString();
         AReceiptInfo.RECEPTION_TIME = Reception_time.substr(0, 10) + 'T' + Reception_time.substr(11, 8) + 'Z';
         var date = result[0].RECEPTION_TIME;
         AReceiptInfo.RECEPTION_TIME_TEXT = date.getUTCFullYear() + '년' + (date.getUTCMonth()+1) + '월' + date.getUTCDate() + '일 ' 
                                             + date.getUTCHours() + '시' + date.getUTCMinutes() + '분';
-        AReceiptInfo.R_KEY = result[0].R_KEY;
+        AReceiptInfo.WORKLIST_KEY = result[0].WORKLIST_KEY;
     }
     else{
         AReceiptInfo.RECEPTION_TIME = ARowReceiptInfo.date + 'T' + ARowReceiptInfo.time + 'Z';
@@ -123,8 +123,8 @@ exports.Checkreceipt = function(InMemberid, res){
 
 exports.getAgentReceiptListCheck = function(req, res){
     console.log(req.body.R_KEY);
-    var R_KEYList = req.body.R_KEY;
-    Db.queryUPDATERECEPTIONEdit(1, R_KEYList, function(err){
+    var WORKLIST = req.body.R_KEY;
+    Db.queryUPDATERECEPTIONEdit(1, WORKLIST, function(err){
         if(err){
             console.log(err);
             res.send('FAIL');
@@ -163,11 +163,11 @@ function SetOfficeInfoArray(result){
 
     result.forEach(element => {
         AOfficeInfo = new Object();
-        AOfficeInfo.O_KEY = element.O_KEY;
-        AOfficeInfo.O_NAME = element.O_NAME;
-        AOfficeInfo.H_KEY = element.H_KEY;
+        AOfficeInfo.OFFICE_KEY = element.OFFICE_KEY;
+        AOfficeInfo.OFFICE_NAME = element.OFFICE_NAME;
+        AOfficeInfo.HOSNUM = element.HOSNUM;
         AOfficeInfo.PATIENT_COUNT = element.PATIENT_COUNT;
-        AOfficeInfo.H_NAME = element.H_NAME;
+        AOfficeInfo.HOSNAME = element.HOSNAME;
         AOfficeInfoArray.push(AOfficeInfo);
     });
     
@@ -201,14 +201,14 @@ function SetAgentReceiptInfoArray(result){
     result.forEach(element => {
         AReceiptInfo = new Object();
                 
-        AReceiptInfo.operation = element.S_KEY;
+        AReceiptInfo.operation = element.STATE_KEY;
         AReceiptInfo.createdAt = element.RECEPTION_TIME;
-        AReceiptInfo._id = element.R_KEY;
-        AReceiptInfo.hospital = element.H_KEY;
-        AReceiptInfo.userId = element.M_KEY;
+        AReceiptInfo._id = element.WORKLIST;
+        AReceiptInfo.hospital = element.HOSNUM;
+        AReceiptInfo.userId = element.MEMBER_KEY;
         AReceiptInfo.nationalInfo = element.FOREIGNER ? 1:0;
-        AReceiptInfo.roomTitle = element.O_NAME;
-        AReceiptInfo.userName = element.M_NAME;
+        AReceiptInfo.roomTitle = element.OFFICE_NAME;
+        AReceiptInfo.userName = element.MEMBER_NAME;
         AReceiptInfo.userPhone = element.PHONE;
         AReceiptInfo.birthDate = element.BIRTHDAY;
         AReceiptInfo.gender = element.GENDER;        
@@ -235,8 +235,8 @@ exports.updateNumOfWaitingPatients = function(req, res){
 
 exports.FinishReceipt = function(req, res){
     var ReceiptInfo = new Object();
-    ReceiptInfo.R_KEY= req.body.R_KEY;
-    ReceiptInfo.S_KEY= TypeConst.StateType.ReservationFinish;
+    ReceiptInfo.WORKLIST_KEY= req.body.R_KEY;
+    ReceiptInfo.STATE_KEY= TypeConst.StateType.ReservationFinish;
     Db.queryINSERT(ReceiptInfo, function(err){
         if(err){
             console.log(err);
