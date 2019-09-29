@@ -87,14 +87,20 @@ function SetReservationInfo(result, ARowReservationInfo, State){
         AReservationInfo.RECEPTION_TIME = Reception_time.substr(0, 10) + 'T' + Reception_time.substr(11, 8) + 'Z';
         var date = result[0].RECEPTION_TIME;
         AReservationInfo.RECEPTION_TIME_TEXT = date.getUTCFullYear() + '년' + (date.getUTCMonth()+1) + '월' + date.getUTCDate() + '일 ' 
-                                            + date.getUTCHours() + '시' + date.getUTCMinutes() + '분';
+                                            + date.getUTCHours() + '시';
+        if (date.getUTCMinutes() != 0){
+            AReservationInfo.RECEPTION_TIME_TEXT = AReservationInfo.RECEPTION_TIME_TEXT + date.getUTCMinutes() + '분';
+        }
         AReservationInfo.WORKLIST_KEY = result[0].WORKLIST_KEY;
     }
     else{
         AReservationInfo.RECEPTION_TIME = ARowReservationInfo.date + 'T' + ARowReservationInfo.time + 'Z';
         var date = new Date(AReservationInfo.RECEPTION_TIME);
         AReservationInfo.RECEPTION_TIME_TEXT = date.getUTCFullYear() + '년' + (date.getUTCMonth()+1) + '월' + date.getUTCDate() + '일 ' 
-                                            + date.getUTCHours() + '시' + date.getUTCMinutes() + '분';
+                                            + date.getUTCHours() + '시';
+        if (date.getUTCMinutes() != 0){
+            AReservationInfo.RECEPTION_TIME_TEXT = AReservationInfo.RECEPTION_TIME_TEXT + date.getUTCMinutes() + '분';
+        }
     }
     return AReservationInfo;
 }
