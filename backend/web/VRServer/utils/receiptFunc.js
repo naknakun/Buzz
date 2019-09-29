@@ -123,7 +123,7 @@ exports.Checkreceipt = function(InMemberid, res){
 
 exports.getAgentReceiptListCheck = function(req, res){
     console.log(req.body.R_KEY);
-    var WORKLIST = req.body.R_KEY;
+    var WORKLIST = req.body.WORKLIST;
     Db.queryUPDATERECEPTIONEdit(1, WORKLIST, function(err){
         if(err){
             console.log(err);
@@ -235,7 +235,7 @@ exports.updateNumOfWaitingPatients = function(req, res){
 
 exports.FinishReceipt = function(req, res){
     var ReceiptInfo = new Object();
-    ReceiptInfo.WORKLIST_KEY= req.body.R_KEY;
+    ReceiptInfo.WORKLIST_KEY= req.body.WORKLIST_KEY;
     ReceiptInfo.STATE_KEY= TypeConst.StateType.ReservationFinish;
     Db.queryINSERT(ReceiptInfo, function(err){
         if(err){
