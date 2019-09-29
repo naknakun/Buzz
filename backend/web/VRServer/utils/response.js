@@ -21,15 +21,15 @@ exports.GetCNOPResText = function(InOfficeInfoArray){
     return resText.trim();
 }
 
-exports.GetReceiptResText = function(ReceiptInfo){
-    if(ReceiptInfo.STATE_KEY == TypeConst.StateType.Reservation)
+exports.GetReservationResText = function(ReservationInfo){
+    if(ReservationInfo.STATE_KEY == TypeConst.StateType.Reservation)
         var resTextBorn = "%s님 %s에 %s에 예약 되었습니다.";
-    else if(ReceiptInfo.STATE_KEY == TypeConst.StateType.ReservationCancel)
+    else if(ReservationInfo.STATE_KEY == TypeConst.StateType.ReservationCancel)
         var resTextBorn = "%s님 %s에 %s에 예약취소 되었습니다."; 
 
     var resText = util.format(resTextBorn, 
-                              ReceiptInfo.MEMBER_NAME, 
-                              ReceiptInfo.HOSNAME, 
-                              ReceiptInfo.RECEPTION_TIME_TEXT);
+                              ReservationInfo.MEMBER_NAME, 
+                              ReservationInfo.HOSNAME, 
+                              ReservationInfo.RECEPTION_TIME_TEXT);
     return resText;
 }

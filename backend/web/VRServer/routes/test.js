@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var request = require('request');
 
-var receipt = require('../utils/receiptFunc');
+var reservationFunc = require('../utils/reservationFunc');
 var TextFunc = require('../utils/textutil');
 
 //request.get 테스트
@@ -47,30 +47,30 @@ router.post('/dialogFlow', TextFunc.dialogFlow);
 
 //agent 테스트
 //접수정보리스트 get
-router.post('/getAgentReceiptList', receipt.getAgentReceiptList);
+router.post('/getAgentReservationList', reservationFunc.getAgentReservationList);
 //접수정보리스트 getCheck
-router.post('/getAgentReceiptListCheck', receipt.getAgentReceiptListCheck);
+router.post('/getAgentReservationListCheck', reservationFunc.getAgentReservationListCheck);
 //대기열 정보 update
-router.post('/updateNumOfWaitingPatients', receipt.updateNumOfWaitingPatients);
+router.post('/updateNumOfWaitingPatients', reservationFunc.updateNumOfWaitingPatients);
 //예약 완료 INSERT
-router.post('/FinishReceipt', receipt.FinishReceipt);
+router.post('/FinishReservation', reservationFunc.FinishReservation);
 
 // 각 기능 테스트
-router.post('/Makereceipt', function(req, res){
+router.post('/MakeReservation', function(req, res){
   var info = JSON.parse(req.body);
-  receipt.Makereceipt(info, res);
+  reservationFunc.MakeReservation(info, res);
 });
-router.post('/Cancelreceipt', function(req, res){
+router.post('/CancelReservation', function(req, res){
   var info = JSON.parse(req.body);
-  receipt.Cancelreceipt(info.MEMBERID, res);
+  reservationFunc.CancelReservation(info.MEMBERID, res);
 });
-router.post('/Checkreceipt', function(req, res){
+router.post('/CheckReservation', function(req, res){
   var info = JSON.parse(req.body);
-  receipt.Checkreceipt(info.MEMBERID, res);
+  reservationFunc.CheckReservation(info.MEMBERID, res);
 });
 router.post('/CheckNumOfWaitingPatients', function(req, res){
   var info = JSON.parse(req.body);
-  receipt.CheckNumOfWaitingPatients(info["ClinicName"], res);
+  reservationFunc.CheckNumOfWaitingPatients(info["ClinicName"], res);
 });
 
 //app에서 text 전송 테스트

@@ -1,6 +1,6 @@
 var API_Call = require('./DFCall')('another');
 var dialog = require('./dialogtest');
-var receipt = require('./receiptFunc');
+var reservationFunc = require('./reservationFunc');
 var responseFunc = require('./response');
 var TypeConst = require('../Common/Const/TypeConst');
 
@@ -41,22 +41,22 @@ exports.dialogFlow = function(req, res){
         switch(result.intent.displayName){
           //예약요청 
           case 'MakeReservation':{
-            receipt.Makereceipt(SetReciptInfo(result.parameters.fields, TextBody["MEMBERID"]), res);
+            reservationFunc.MakeReservation(SetReservationInfo(result.parameters.fields, TextBody["MEMBERID"]), res);
             return;
           }
           //예약취소
           case 'CancelReservation':{
-            receipt.Cancelreceipt(TextBody["MEMBERID"], res);
+            reservationFunc.CancelReservation(TextBody["MEMBERID"], res);
             return;
           }
           //예약확인
           case 'CheckReservation':{
-            receipt.Checkreceipt(TextBody["MEMBERID"], res);
+            reservationFunc.CheckReservation(TextBody["MEMBERID"], res);
             return;
           }
           //대기열확인
           case 'CheckNumOfWaitingPatients':{
-            receipt.CheckNumOfWaitingPatients(result.parameters.fields["ClinicName"].stringValue, res);
+            reservationFunc.CheckNumOfWaitingPatients(result.parameters.fields["ClinicName"].stringValue, res);
             return;
           }
           default:{
@@ -89,7 +89,7 @@ exports.dialogFlowStart = function(req, res){
   });
 };
 
-function SetReciptInfo(RowParameters, memberId){
+function SetReservationInfo(RowParameters, memberId){
   var Parameters = {clinicName:'', date:'', time:'', patientId:''};
   Parameters.clinicName = RowParameters.ClinicName.stringValue; 
   var datestr = RowParameters.date.stringValue;

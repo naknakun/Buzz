@@ -7,7 +7,7 @@ var responseFunc = require('../utils/response');
 var Dbcon = require('./dbCon');
 var TypeConst = require("../Common/Const/TypeConst");
 
-exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){    
+exports.querySELECTReservationInfo = function(InRowReservationInfo, response){    
     var connection = new Connection(Dbcon.config);
     connection.on('connect', function(err){
         if(err){
@@ -24,7 +24,7 @@ exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){
                                     AND M.MEMBER_ID = '%s'
                                     AND O.OFFICE_NAME = '%s'                            
                                 `;
-            var query = util.format(queryString, InRowReceiptInfo.clinicName, InRowReceiptInfo.MEMBERID, '진료실');
+            var query = util.format(queryString, InRowReservationInfo.clinicName, InRowReservationInfo.MEMBERID, '진료실');
             executeSELECT(connection, query, function(error, results) {
                 if(error){
                     response(error);
@@ -38,7 +38,7 @@ exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){
     });    
 };
 
-exports.querySELECTReceiptUnFinish = function(InMemberid, response){    
+exports.querySELECTReservationUnFinish = function(InMemberid, response){    
     var connection = new Connection(Dbcon.config);
     connection.on('connect', function(err){
         if(err){
@@ -139,18 +139,18 @@ exports.querySELECTOFFICE = function(InHospitalName, response){
     });    
 };
 
-exports.queryINSERT = function(InReceiptInfo, response){
+exports.queryINSERT = function(InReservationInfo, response){
     var connection = new Connection(Dbcon.config);
     connection.on('connect', function(err){
         if(err){
             response(err);
         }
         else{
-            if(InReceiptInfo.STATE_KEY == TypeConst.StateType.Reservation){
-                executeINSERT(connection, InReceiptInfo, response);
+            if(InReservationInfo.STATE_KEY == TypeConst.StateType.Reservation){
+                executeINSERT(connection, InReservationInfo, response);
             }
-            else if(InReceiptInfo.STATE_KEY == TypeConst.StateType.ReservationCancel || InReceiptInfo.STATE_KEY == TypeConst.StateType.ReservationFinish){
-                executeINSERTReception_Result(connection, InReceiptInfo, response);
+            else if(InReservationInfo.STATE_KEY == TypeConst.StateType.ReservationCancel || InReservationInfo.STATE_KEY == TypeConst.StateType.ReservationFinish){
+                executeINSERTWorklist_Result(connection, InReservationInfo, response);
             }           
         }
     });    
@@ -180,7 +180,7 @@ function executeSELECT(connection, query, callback) {
     connection.execSql(request);
 }
 
-function executeINSERT(connection, InReceiptInfo, callback) {
+function executeINSERT(connection, InReservationInfo, callback) {
     var query = `
     INSERT INTO [DBO].[WORKLIST]
     (
@@ -219,15 +219,15 @@ function executeINSERT(connection, InReceiptInfo, callback) {
             return callback(null);
         }
     );
-    request.addParameter('MEMBER_KEY', TYPES.Int, InReceiptInfo.MEMBER_KEY);  
-    request.addParameter('HOSNUM', TYPES.NVarChar, InReceiptInfo.HOSNUM);  
-    request.addParameter('OFFICE_KEY', TYPES.Int, InReceiptInfo.OFFICE_KEY);  
-    request.addParameter('RECEPTION_TIME', TYPES.DateTime, new Date(InReceiptInfo.RECEPTION_TIME));
+    request.addParameter('MEMBER_KEY', TYPES.Int, InReservationInfo.MEMBER_KEY);  
+    request.addParameter('HOSNUM', TYPES.NVarChar, InReservationInfo.HOSNUM);  
+    request.addParameter('OFFICE_KEY', TYPES.Int, InReservationInfo.OFFICE_KEY);  
+    request.addParameter('RECEPTION_TIME', TYPES.DateTime, new Date(InReservationInfo.RECEPTION_TIME));
 
     connection.execSql(request);
 }
 
-function executeINSERTReception_Result(connection, InReceiptInfo, callback) {
+function executeINSERTWorklist_Result(connection, InReservationInfo, callback) {
     var query = `
     INSERT INTO [DBO].[WORKLIST_RESULT]
     (
@@ -248,12 +248,12 @@ function executeINSERTReception_Result(connection, InReceiptInfo, callback) {
             return callback(null);    
         }
     );
-    request.addParameter('WORKLIST_KEY', TYPES.Int, InReceiptInfo.WORKLIST_KEY);  
-    request.addParameter('STATE_KEY', TYPES.Int, InReceiptInfo.STATE_KEY);  
+    request.addParameter('WORKLIST_KEY', TYPES.Int, InReservationInfo.WORKLIST_KEY);  
+    request.addParameter('STATE_KEY', TYPES.Int, InReservationInfo.STATE_KEY);  
     connection.execSql(request);
 }
 
-exports.querySELECTAgentReceiptList = function(Inhosnum, response){    
+exports.querySELECTAgentReservationList = function(Inhosnum, response){    
     var connection = new Connection(Dbcon.config);
     connection.on('connect', function(err){
         if(err){
@@ -263,7 +263,7 @@ exports.querySELECTAgentReceiptList = function(Inhosnum, response){
             var queryString = `
                             SELECT 
                                 W.WORKLIST_KEY, 
-                                (CASE WHEN WR.STATE_KEY = 0 THEN 'RECEIPT' WHEN WR.STATE_KEY = 1 THEN 'CANCEL' END) AS STATE_KEY, 
+                                (CASE WHEN WR.STATE_KEY = 0 THEN 'RESERVATION' WHEN WR.STATE_KEY = 1 THEN 'RESERVATIONCANCEL' END) AS STATE_KEY, 
                                 W.RECEPTION_TIME, W.HOSNUM, M.MEMBER_KEY, M.FOREIGNER,
                                 O.OFFICE_NAME, M.MEMBER_NAME, M.PHONE, M.BIRTHDAY, M.GENDER
                             FROM
@@ -350,7 +350,7 @@ exports.queryUPDATENumOfWaitingPatients = function(InOfficeInfo, response){
     });    
 };
 
-exports.queryUPDATERECEPTIONEdit = function(EditType, WORKLIST, response){    
+exports.queryUPDATEReservationEdit = function(EditType, WORKLIST, response){    
     var connection = new Connection(Dbcon.config);
     connection.on('connect', function(err){
         if(err){
