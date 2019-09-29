@@ -16,7 +16,7 @@ exports.querySELECTReceiptInfo = function(InRowReceiptInfo, response){
         else{
             var queryString = `
                                 SELECT
-                                    H.HOSNUM, M.MEMBER_KEY, O.OFFICE_KEY, H.HOSNAME, M.NAME
+                                    H.HOSNUM, M.MEMBER_KEY, O.OFFICE_KEY, H.HOSNAME, M.MEMBER_NAME
                                 FROM
                                     [HOSPITAL] H, [MEMBER] M, [OFFICE] O
                                 WHERE
@@ -263,7 +263,7 @@ exports.querySELECTAgentReceiptList = function(Inhosnum, response){
             var queryString = `
                             SELECT 
                                 W.WORKLIST_KEY, 
-                                (CASE WHEN RR.STATE_KEY = 0 THEN 'RECEIPT' WHEN RR.STATE_KEY = 1 THEN 'CANCEL' END) AS STATE_KEY, 
+                                (CASE WHEN WR.STATE_KEY = 0 THEN 'RECEIPT' WHEN WR.STATE_KEY = 1 THEN 'CANCEL' END) AS STATE_KEY, 
                                 W.RECEPTION_TIME, W.HOSNUM, M.MEMBER_KEY, M.FOREIGNER,
                                 O.OFFICE_NAME, M.MEMBER_NAME, M.PHONE, M.BIRTHDAY, M.GENDER
                             FROM

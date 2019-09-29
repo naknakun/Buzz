@@ -203,7 +203,7 @@ function SetAgentReceiptInfoArray(result){
                 
         AReceiptInfo.operation = element.STATE_KEY;
         AReceiptInfo.createdAt = element.RECEPTION_TIME;
-        AReceiptInfo._id = element.WORKLIST;
+        AReceiptInfo._id = element.WORKLIST_KEY;
         AReceiptInfo.hospital = element.HOSNUM;
         AReceiptInfo.userId = element.MEMBER_KEY;
         AReceiptInfo.nationalInfo = element.FOREIGNER ? 1:0;
