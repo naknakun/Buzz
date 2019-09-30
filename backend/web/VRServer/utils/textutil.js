@@ -1,5 +1,5 @@
 var API_Call = require('./DFCall')('another');
-var dialog = require('./dialogtest');
+var dialog = require('./dialogFlowFunc');
 var reservationFunc = require('./reservationFunc');
 var responseFunc = require('./response');
 var TypeConst = require('../Common/Const/TypeConst');
