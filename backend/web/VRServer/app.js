@@ -6,11 +6,15 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var testRouter = require('./routes/test');
 var ClientServiceRouter = require('./routes/ClientService');
+var cookie = require('./routes/cookie');
+var sess = require('./routes/session');
 
 var app = express();
 
@@ -21,16 +25,27 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser('12214!@$!@#$$!'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({extended : false}));
+app.use(session({
+  secret : '124@#$#!@$',
+  resave : false,
+  saveUninitialized : true,
+  store : new FileStore()
+}));
+
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/test', testRouter);
 app.use('/ClientService', ClientServiceRouter);
+app.use('/cookie', cookie);
+app.use('/session', sess);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
